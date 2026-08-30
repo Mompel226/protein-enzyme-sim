@@ -4,14 +4,22 @@ An interactive simulation for **IB Biology SL — B1.2 Proteins and C1.1 Enzymes
 
 **Run it:** open `index.html`, or use the GitHub Pages link for this repository.
 
-## Mode 1 · Build a polypeptide (B1.2.1–B1.2.2)
+## Mode 1 · Bond builder (B1.1.5–7 · B1.1.9 · B1.2.1–2)
+
+Six guided builds, all using the same pick-the-leaving-atoms chemistry (–OH + –H → water):
+**Polypeptide** (peptide bonds, gene-ordered) · **Maltose** (α-1,4) · **Starch + branch** (α-1,4 then α-1,6) · **Cellulose** (β-1,4 — the incoming glucose must be flipped first) · **Triglyceride** (3 ester bonds) · **Phospholipid** (2 fatty acids + phosphate).
+
+### The polypeptide build
 
 - A partly finished maltase chain; the **gene dictates the order** of the last four amino acids (Ser–Cys–Asp–Lys). Wrong amino acid → rejected, with the reason.
 - **Drag** the amino acid to the chain's carboxyl end, then — in a large close-up — **click the two atoms that leave as water**: the chain's carboxyl –OH and the newcomer's amine –H. Wrong atoms (the double-bonded O, the R-group, the wrong end) are refused with an explanation.
 - Watch the condensation slowly: water forms and leaves, the C–N **peptide bond** draws in, the word equation and the H₂O counter update.
 - Fold the finished chain: 3 hydrogen bonds, 1 ionic bond (Asp⁻·Lys⁺), 1 disulfide (Cys–Cys), and a hydrophobic core tucked **inside** the fold. Then send *your* maltase into the lab.
 
-## Mode 2 · Enzyme lab (C1.1 · B1.2.5)
+## Mode 2 · Enzyme lab (C1.1 · B1.2.5 · B1.1.5–7)
+
+- **Molecule inspector**: click ANY molecule or enzyme for a large view with a **Simple ⇄ Chemical 2-D** toggle — Haworth rings with labelled α-1,4 / α-1,6 / β-1,4 bonds for glucose, maltose, amylose, amylopectin, glycogen and cellulose; peptide-bond segments and per-bond close-ups (Ser –O–H ⋯ O=C, Asp⁻ ⋯ Lys⁺, Cys–S–S–Cys) for enzymes.
+- **Carbohydrate set**: amylose and amylopectin (starch), glycogen, cellulose. Cellulose is never digested (no β-1,4 enzyme here); amylase stalls at α-1,6 branch points, leaving a **limit dextrin**.
 
 - **Amylase** (starch → maltose, one maltose per binding), **maltase** (maltose → glucose + glucose), **starch synthase** (builds starch from glucose by condensation), and a **competitive inhibitor** of amylase.
 - Water is explicit: droplets fly **in** for hydrolysis and **out** for condensation, with running counts.

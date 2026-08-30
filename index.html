@@ -70,7 +70,8 @@
   .narration div{margin:2px 0}
   .narration .hot{color:var(--ox); font-weight:600}
   section.center{display:flex; flex-direction:column; gap:12px; min-width:0}
-  .stage{position:relative; background:var(--panel); border:1px solid var(--rule); border-radius:4px; flex:1; min-height:380px}
+  .stage{position:relative; background:var(--panel); border:1px solid var(--rule); border-radius:4px; flex:1; min-height:440px}
+  .stage canvas{position:absolute; inset:0; width:100%; height:100%}
   canvas{display:block; width:100%; height:100%}
   .stage .hint{position:absolute; left:12px; bottom:10px; color:var(--mut); font-size:11px; font-style:italic; pointer-events:none}
   aside.right{display:flex; flex-direction:column; gap:12px; overflow-y:auto}
@@ -109,6 +110,21 @@
   .seqtrack b{color:var(--ink)}
   .seqtrack .next{color:var(--vir); font-weight:700; text-decoration:underline}
   .seqtrack .doneaa{color:var(--green); font-weight:700}
+  .disclaim{font-size:10.5px;color:var(--mut);font-style:italic;padding:7px 12px 8px;border-top:1px dashed var(--rule)}
+  .scopebtn{margin:6px 12px 10px;font-size:11.5px;padding:6px 10px}
+  .note-card{border-radius:5px;padding:12px 16px;margin:12px 0;border-left:5px solid}
+  .note-card h4{margin:0 0 7px;font-size:13.5px;letter-spacing:.05em}
+  .note-card.good{background:var(--virLt);border-color:var(--vir)}
+  .note-card.good h4{color:var(--vir)}
+  .note-card.simp{background:var(--amberLt);border-color:var(--amber)}
+  .note-card.simp h4{color:var(--amber)}
+  .note-card.syll{background:var(--oat);border-color:var(--mut)}
+  .note-card.syll h4{color:var(--mut)}
+  .note-card ul{margin:0;padding-left:17px}
+  .note-card li{margin:5px 0}
+  .glegend .foot{color:var(--mut);font-size:10px;margin-top:6px;line-height:1.35}
+  .bondlist .numchip{width:16px;height:16px;flex:0 0 16px;border-radius:50%;color:#fff;
+    font:700 10px/16px sans-serif;text-align:center}
   .modal{position:fixed; inset:0; background:rgba(36,31,27,.55); display:none; align-items:center; justify-content:center; z-index:50}
   .modal.open{display:flex}
   .modal .box{background:var(--panel); max-width:640px; width:92%; max-height:84vh; overflow-y:auto; border-radius:6px; padding:22px 26px}
@@ -134,7 +150,7 @@
   </div>
   <div class="chips"><span class="chip b12">IB BIOLOGY · B1.2</span><span class="chip c11">C1.1</span></div>
   <nav class="tabs">
-    <button id="tabBuild">1 · Build a polypeptide</button>
+    <button id="tabBuild">1 · Bond builder</button>
     <button id="tabLab" class="active">2 · Enzyme lab</button>
   </nav>
   <div class="transport">
@@ -144,7 +160,7 @@
       <option value="0.5">×0.5</option><option value="1" selected>×1</option><option value="2">×2</option>
     </select>
     <button class="tbtn warn" id="btnReset">Reset</button>
-    <button class="tbtn" id="btnHelp" title="Science notes">?</button>
+    <button class="tbtn" id="btnHelp">What is real?</button>
   </div>
 </header>
 
@@ -171,8 +187,11 @@
       <div class="body" id="counters"></div>
     </div>
     <div class="card" id="buildTray" style="display:none">
-      <h3>Amino acid supply</h3>
+      <h3>Bond builder — choose a bond</h3>
       <div class="body">
+        <div class="btnrow" id="exButtons"></div>
+        <div class="btnrow"><button class="tbtn" id="btnExRestart" style="display:none">↻ Restart this build</button></div>
+        <hr style="border:none;border-top:1px solid var(--rule);margin:8px 0">
         <div class="seqtrack" id="seqTrack"></div>
         <div class="btnrow" id="aaButtons"></div>
         <div class="btnrow">
@@ -206,6 +225,8 @@
     <div class="card">
       <h3>Under the microscope</h3>
       <canvas id="scopeCanvas"></canvas>
+      <div class="disclaim">Simplified model — <b>not</b> the molecule’s real shape (real enzymes are hundreds of amino acids). The bond types and their behaviour are the real science.</div>
+      <button class="tbtn scopebtn" id="btnInspect">🔍 Open large inspector</button>
       <div class="body">
         <div id="scopeName" style="font-weight:700"></div>
         <ul class="bondlist" id="bondList"></ul>
@@ -225,10 +246,12 @@
     <div class="glegend" id="gLegend">
       <div style="font-weight:700; margin-bottom:2px">Concentration <span style="color:var(--mut); font-weight:400">(molecules)</span></div>
       <div class="row" data-s="starch"><span class="line" style="border-color:var(--sStarch)"></span>starch<span class="val" id="vStarch">0</span></div>
+      <div class="row" data-s="glycogen"><span class="line" style="border-color:#2E6FB8"></span>glycogen<span class="val" id="vGlycogen">0</span></div>
       <div class="row" data-s="maltose"><span class="line" style="border-color:var(--sMaltose)"></span>maltose<span class="val" id="vMaltose">0</span></div>
       <div class="row" data-s="glucose"><span class="line" style="border-color:var(--sGlucose)"></span>glucose<span class="val" id="vGlucose">0</span></div>
       <div class="muted">H₂O used in hydrolysis: <b id="wUsed">0</b><br>H₂O released by condensation: <b id="wMade">0</b></div>
       <div class="muted">click a row to hide/show · hover the graph to read values</div>
+      <div class="foot">cellulose is not plotted: nothing in this beaker can cut its β-1,4 bonds, so its count never changes.</div>
     </div>
   </div>
 </footer>
@@ -240,28 +263,42 @@
 <div class="modal" id="helpModal">
   <div class="box">
     <button class="tbtn close" onclick="document.getElementById('helpModal').classList.remove('open')">Close</button>
-    <h2>Science notes</h2>
-    <h4>What is accurate here</h4>
-    <ul>
-      <li>Enzymes are drawn as <b>chains of amino acids</b> folded into a 3-D shape held by <b>weak interactions between R-groups</b>: hydrogen bonds, ionic bonds and a hydrophobic cluster — plus one covalent <b>disulfide bond</b> between two cysteines.</li>
-      <li><b>Heat</b> makes every particle move and vibrate more (kinetic energy → more collisions → faster reaction) until vibration starts <b>breaking the weak intramolecular bonds</b>. The shape — including the active site — is lost: <b>denaturation</b>. The peptide bonds and the sequence are untouched.</li>
-      <li><b>pH</b> changes the charges on acidic (–COO⁻) and basic (–NH₃⁺) R-groups, breaking or re-making <b>ionic bonds</b>. Mild changes can be reversible; extremes denature the enzyme permanently. The covalent S–S bond survives both.</li>
-      <li><b>Hydrolysis consumes water</b> (watch the blue droplet fly IN as amylase or maltase cuts). <b>Condensation releases water</b> (droplet OUT at the synthase, and in Build mode).</li>
-      <li>Denaturation is <b>usually permanent</b>: cooling the beaker does not refold a cooked enzyme.</li>
-      <li>A <b>competitive inhibitor</b> has a shape close enough to the substrate's to sit in the active site and block it, without being changed itself.</li>
-      <li>Optimum conditions are <b>protein-specific</b>. The enzymes here happen to like ~37 °C and pH 7 — but remember pepsin, whose optimum is stomach acid at pH ≈ 1.5.</li>
-    </ul>
-    <h4>Deliberate simplifications</h4>
-    <ul>
-      <li><b>Enzyme and molecule shapes are cartoons, not real structures.</b> Enzymes here are ~16 amino acids so you can see every bead and bond — real amylase is a single chain of ~500. The fold shown (weak bonds pinning a shape with an active site, hydrophobic core inside) is the real principle; the outline is not the real molecule.</li>
-      <li>Starch is drawn as a short straight chain of glucose hexagons. Real starch is hundreds to thousands of units — helical amylose plus branched amylopectin (B1.1.5).</li>
-      <li>Real amylase cuts bonds inside the chain, releasing maltose and short fragments; here each binding event frees exactly one maltose. One binding → one cut → release — the enzyme must bind again to cut again.</li>
-      <li>Real starch synthase does not run condensation for free: cells first <b>activate glucose using ATP</b> (as ADP-glucose). Condensation always has to be paid for (B1.1 → C1).</li>
-      <li>"Maltase" is the everyday name for the enzyme that hydrolyses maltose; in your gut it sits in the membrane of intestinal cells.</li>
-      <li>Numbers of molecules stand in for concentration; the graph counts them.</li>
-    </ul>
-    <h4>Syllabus links</h4>
-    <p><b>B1.2.1–2</b> generalized amino acid; condensation → dipeptide + water (Build mode). <b>B1.2.5</b> effect of pH and temperature on protein structure — "denaturation". <b>C1.1</b> enzymes, active sites, collisions, denaturation. Salts are deliberately left out — the IB syllabus names pH and temperature.</p>
+    <h2>What is real, and what is simplified</h2>
+    <p style="color:var(--mut);margin:4px 0 6px">Straight answer: the molecule <b>shapes are cartoons</b>, drawn small enough to see every bond. The <b>bond types, the chemistry and the behaviour</b> are the real science your exams test.</p>
+    <div class="note-card good">
+      <h4>✓ REAL — trust these</h4>
+      <ul>
+        <li>Proteins are chains of amino acids folded into shapes pinned by <b>weak interactions between R-groups</b>: hydrogen bonds, ionic bonds, hydrophobic cores — plus covalent <b>disulfide bonds</b> between cysteines.</li>
+        <li><b>Heat</b> → more kinetic energy → faster collisions and reactions, until vibration <b>breaks the weak intramolecular bonds</b>: denaturation. Peptide bonds and the sequence survive. Heat damage is <b>usually permanent</b>.</li>
+        <li><b>pH</b> changes the charges on acidic (–COO⁻) and basic (–NH₃⁺) R-groups, breaking or re-making <b>ionic bonds</b>. Mild shifts can be reversible; extremes are not.</li>
+        <li><b>Hydrolysis consumes water; condensation releases it</b> — watch the blue droplets.</li>
+        <li>In the Chemical view, the linkage geometry is the real thing: <b>α-1,4</b> in maltose and starch, <b>α-1,6</b> at branch points, <b>β-1,4</b> in cellulose with every second glucose inverted, <b>peptide bonds</b> between amino acids, <b>ester bonds</b> in lipids.</li>
+        <li><b>Cellulose is not digested here</b> — amylase’s active site cannot bind β-1,4 chains, and humans make no cellulase. Amylase also stalls at branch points (limit dextrin) — debranching enzymes exist, but not in this beaker.</li>
+        <li>A <b>competitive inhibitor</b> resembles the substrate’s shape, blocks the active site, and is not changed.</li>
+        <li>Optima are <b>protein-specific</b>: these enzymes like ~37 °C and pH 7; pepsin’s optimum is stomach acid, pH ≈ 1.5.</li>
+        <li>Enzymes are <b>reused, never used up</b> — watch the reaction counter.</li>
+      </ul>
+    </div>
+    <div class="note-card simp">
+      <h4>≈ SIMPLIFIED — cartoon scale</h4>
+      <ul>
+        <li>Enzymes here are ~16 amino acids; <b>real amylase is a single chain of ~500</b>. The blob outline is not the real fold.</li>
+        <li>Polysaccharide chains are 6–10 units; real amylose runs to thousands, glycogen far more branched than drawn.</li>
+        <li>Real amylase cuts <i>inside</i> chains releasing maltose and fragments; here each binding frees exactly one maltose.</li>
+        <li>Real starch synthase first <b>activates glucose using ATP</b> (ADP-glucose) — condensation is never free.</li>
+        <li>“Maltase” is the everyday name; in your gut it sits in the intestinal cell membrane.</li>
+        <li>Molecule counts stand in for concentration.</li>
+      </ul>
+    </div>
+    <div class="note-card syll">
+      <h4>SYLLABUS MAP</h4>
+      <ul>
+        <li><b>B1.1.5–7</b> starch (amylose + amylopectin), glycogen, cellulose — compare them in the inspector’s Chemical view.</li>
+        <li><b>B1.2.1–2</b> amino acid structure and condensation — the Bond builder.</li>
+        <li><b>B1.2.5</b> pH and temperature on protein structure — “denaturation”. Salts are omitted: the syllabus names pH and temperature.</li>
+        <li><b>C1.1</b> enzymes, active sites, collisions, denaturation, inhibitors.</li>
+      </ul>
+    </div>
   </div>
 </div>
 
@@ -274,7 +311,7 @@ const COL = {
   water:"#4C8FD6", starch:"#A85E0B", maltose:"#188A66", glucose:"#7D4FA6",
   hexFill:"#E8C77E", hexEdge:"#A85E0B",
   beadPhil:"#9EC5B5", beadPhob:"#D6B98C", beadAcid:"#C25B4A", beadBase:"#5B7FC2", beadCys:"#D9B23F",
-  inhib:"#B03A6E"
+  inhib:"#B03A6E", sGlycogen:"#2E6FB8"
 };
 const TAU = Math.PI*2;
 const rand = (a,b)=>a+Math.random()*(b-a);
@@ -369,9 +406,18 @@ function makeFoldTemplate(kind){
 
 /* ================= particle classes ================= */
 let PID=1;
-function makeSugar(units,x,y){
-  return {id:PID++, kind:"sugar", units, x, y, vx:rand(-30,30), vy:rand(-30,30),
-    rot:rand(0,TAU), vr:rand(-1,1), held:false, r: 9+units*4};
+const SUGAR_DEFS={
+  glucose:{units:1}, maltose:{units:2}, amylose:{units:6},
+  amylopectin:{units:7, branches:[[2,2]]}, glycogen:{units:6, branches:[[1,2],[3,2]]},
+  cellulose:{units:6}
+};
+function makeSugar(stype,x,y){
+  const d=SUGAR_DEFS[stype];
+  const branches=(d.branches||[]).map(b=>b.slice());
+  const tot=d.units+branches.reduce((a,b)=>a+b[1],0);
+  return {id:PID++, kind:"sugar", stype, units:d.units, branches, x, y,
+    vx:rand(-30,30), vy:rand(-30,30), rot:rand(0,TAU), vr:rand(-1,1),
+    held:false, limit:false, r: 9+tot*3.4};
 }
 function makeInhibitor(x,y){
   return {id:PID++, kind:"inhib", x, y, vx:rand(-30,30), vy:rand(-30,30),
@@ -397,15 +443,15 @@ function outlineColor(e){
 }
 
 /* ================= population management ================= */
-const POP = {starch:4, glucose:5, amylase:2, maltase:2, synthase:1, inhib:0};
+const POP = {amylose:2, amylopectin:2, glycogen:1, cellulose:1, glucose:5, maltose:0, amylase:2, maltase:2, synthase:1, inhib:0};
 function world(){ return document.getElementById("worldCanvas"); }
 function spawnAll(){
   S.particles=[]; S.effects=[]; S.waterUsed=0; S.waterMade=0;
   S.chart.data=[]; S.chart.lastSample=0; S.t=0;
   const {w,h}=fitCanvas(world());
   const px=()=>rand(60,w-60), py=()=>rand(50,h-50);
-  for(let i=0;i<POP.starch;i++) S.particles.push(makeSugar(6,px(),py()));
-  for(let i=0;i<POP.glucose;i++) S.particles.push(makeSugar(1,px(),py()));
+  for(const st of ["amylose","amylopectin","glycogen","cellulose","glucose","maltose"])
+    for(let i=0;i<POP[st];i++) S.particles.push(makeSugar(st,px(),py()));
   for(let i=0;i<POP.amylase;i++) S.particles.push(makeEnzyme("amylase",px(),py()));
   for(let i=0;i<POP.maltase;i++) S.particles.push(makeEnzyme("maltase",px(),py()));
   for(let i=0;i<POP.synthase;i++) S.particles.push(makeEnzyme("synthase",px(),py()));
@@ -416,14 +462,25 @@ function spawnAll(){
 function adjustPop(key, delta){
   POP[key]=clamp(POP[key]+delta,0,8);
   document.getElementById("n_"+key).textContent=POP[key];
-  const kindMap={starch:p=>p.kind==="sugar"&&p.units>=3, glucose:p=>p.kind==="sugar"&&p.units===1,
+  const kindMap={
+    amylose:p=>p.kind==="sugar"&&p.stype==="amylose"&&p.units>=3,
+    amylopectin:p=>p.kind==="sugar"&&p.stype==="amylopectin",
+    glycogen:p=>p.kind==="sugar"&&p.stype==="glycogen",
+    cellulose:p=>p.kind==="sugar"&&p.stype==="cellulose",
+    glucose:p=>p.kind==="sugar"&&p.stype==="glucose",
+    maltose:p=>p.kind==="sugar"&&p.stype==="maltose",
     amylase:p=>p.kind==="enzyme"&&p.etype==="amylase", maltase:p=>p.kind==="enzyme"&&p.etype==="maltase",
     synthase:p=>p.kind==="enzyme"&&p.etype==="synthase", inhib:p=>p.kind==="inhib"};
   const match=S.particles.filter(kindMap[key]);
   const {w,h}=fitCanvas(world());
   if (delta>0){
-    const mk={starch:()=>makeSugar(6,rand(60,w-60),rand(50,h-50)),
-      glucose:()=>makeSugar(1,rand(60,w-60),rand(50,h-50)),
+    const mk={
+      amylose:()=>makeSugar("amylose",rand(60,w-60),rand(50,h-50)),
+      amylopectin:()=>makeSugar("amylopectin",rand(60,w-60),rand(50,h-50)),
+      glycogen:()=>makeSugar("glycogen",rand(60,w-60),rand(50,h-50)),
+      cellulose:()=>makeSugar("cellulose",rand(60,w-60),rand(50,h-50)),
+      glucose:()=>makeSugar("glucose",rand(60,w-60),rand(50,h-50)),
+      maltose:()=>makeSugar("maltose",rand(60,w-60),rand(50,h-50)),
       amylase:()=>makeEnzyme("amylase",rand(60,w-60),rand(50,h-50)),
       maltase:()=>makeEnzyme("maltase",rand(60,w-60),rand(50,h-50)),
       synthase:()=>makeEnzyme("synthase",rand(60,w-60),rand(50,h-50)),
@@ -525,9 +582,15 @@ function tryReactions(dt){
         break;
       }
       if (p.kind!=="sugar") continue;
-      if ((e.etype==="amylase") && p.units>=3){ bind(e,p,0.5,"cut"); break; }
-      if ((e.etype==="maltase"||e.etype==="champion") && p.units===2){ bind(e,p,0.45,"cut"); break; }
-      if (e.etype==="synthase" && p.units===1){ bind(e,p,0.4,"join"); break; }
+      if (e.etype==="amylase" && p.stype==="cellulose"){
+        if (!e.cellNarrCd || S.t-e.cellNarrCd>8){ e.cellNarrCd=S.t;
+          narrate("amylase bumped into cellulose and CANNOT bind — β-1,4 links hold the chain in the wrong shape for its active site", true); }
+        continue;
+      }
+      const starchy = (p.stype==="amylose"||p.stype==="amylopectin"||p.stype==="glycogen");
+      if (e.etype==="amylase" && starchy && !p.limit && p.units>=3){ bind(e,p,0.5,"cut"); break; }
+      if ((e.etype==="maltase"||e.etype==="champion") && p.stype==="maltose"){ bind(e,p,0.45,"cut"); break; }
+      if (e.etype==="synthase" && p.stype==="glucose"){ bind(e,p,0.4,"join"); break; }
     }
   }
 }
@@ -544,18 +607,25 @@ function completeReaction(e){
     // hydrolysis: water IN
     S.waterUsed++;
     S.effects.push({type:"waterIn", x:sp.x+rand(-40,40), y:sp.y-60, tx:sp.x, ty:sp.y, t:0, dur:0.5});
-    if (p.units===2){
-      p.held=false; p.units=1; p.r=13;
-      const g=makeSugar(1,sp.x,sp.y); g.vx=-Math.cos(e.rot)*70; g.vy=-Math.sin(e.rot)*70;
+    if (p.stype==="maltose"){
+      p.held=false; p.stype="glucose"; p.units=1; p.r=13;
+      const g=makeSugar("glucose",sp.x,sp.y); g.vx=-Math.cos(e.rot)*70; g.vy=-Math.sin(e.rot)*70;
       p.vx=Math.cos(e.rot)*70; p.vy=Math.sin(e.rot)*70;
       S.particles.push(g);
-      narrate("maltase: maltose + water → glucose + glucose (hydrolysis)");
+      narrate("maltase: maltose + water → glucose + glucose (hydrolysis of the α-1,4 bond)");
     } else {
-      p.held=false; p.units-=2; p.r=9+p.units*4;
-      const m=makeSugar(2,sp.x,sp.y); m.vx=Math.cos(e.rot)*80; m.vy=Math.sin(e.rot)*80;
+      p.held=false; p.units-=2;
+      p.branches=(p.branches||[]).filter(b=>b[0]<p.units);
+      const branched=(p.branches||[]).length>0;
+      const m=makeSugar("maltose",sp.x,sp.y); m.vx=Math.cos(e.rot)*80; m.vy=Math.sin(e.rot)*80;
       p.vx=-Math.cos(e.rot)*40; p.vy=-Math.sin(e.rot)*40;
       S.particles.push(m);
-      narrate("amylase: water in, glycosidic bond cut — one maltose freed from the starch chain");
+      if (p.units<=2 && !branched){ p.stype="maltose"; p.units=2; p.branches=[]; p.limit=false; }
+      else if (p.units<=3 && branched){ p.limit=true;
+        narrate("amylase has reached the α-1,6 branch points — a LIMIT DEXTRIN is left; cutting the branches needs a debranching enzyme this beaker does not have", true); }
+      const tot=p.units+(p.branches||[]).reduce((a,b)=>a+b[1],0);
+      p.r=9+tot*3.4;
+      narrate("amylase: water in, one α-1,4 glycosidic bond cut — one maltose freed");
     }
   } else if (e.holdPhase==="join"){
     // condensation: water OUT
@@ -566,9 +636,9 @@ function completeReaction(e){
     S.effects.push({type:"waterOut", x:sp.x, y:sp.y, tx:sp.x+rand(-50,50), ty:sp.y-70, t:0, dur:0.7});
     narrate(`starch synthase: glucose joined by condensation — water OUT (chain: ${e.synth+1} units)`);
     if (e.synth>=5){
-      const st=makeSugar(6,sp.x,sp.y); st.vx=Math.cos(e.rot)*60; st.vy=Math.sin(e.rot)*60;
+      const st=makeSugar("amylose",sp.x,sp.y); st.vx=Math.cos(e.rot)*60; st.vy=Math.sin(e.rot)*60;
       S.particles.push(st); e.synth=0;
-      narrate("a new starch chain is released — built from glucose, one condensation at a time");
+      narrate("a new amylose (starch) chain is released — built from glucose, one condensation at a time");
     }
   }
   e.holdPhase=null;
@@ -592,22 +662,44 @@ function stepParticles(dt){
 }
 
 /* ================= drawing: molecules ================= */
+function sugarLabel(p){
+  if (p.limit) return "limit dextrin";
+  if (p.stype==="amylose"||p.stype==="amylopectin") return p.stype+" (starch)";
+  return p.stype;
+}
 function drawSugar(ctx,p,scale){
   const s=scale||1, r=8*s;
   ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
   const n=p.units;
-  for(let i=0;i<n;i++){
-    const off=(i-(n-1)/2)*r*1.75;
-    const wob = n>2 ? Math.sin(i*1.3+p.rot)*3*s : 0;
+  const straight = p.stype==="cellulose";
+  const hexAt=(off,wob,flip)=>{
     ctx.fillStyle=COL.hexFill; ctx.strokeStyle=COL.hexEdge; ctx.lineWidth=1.6*s;
     hexagon(ctx,off,wob,r,0.52); ctx.fill(); ctx.stroke();
-    if (i<n-1){ ctx.strokeStyle=COL.hexEdge; ctx.lineWidth=2.2*s;
-      ctx.beginPath(); ctx.moveTo(off+r*0.86,wob); ctx.lineTo(off+r*0.9,wob); ctx.stroke(); }
+    if (straight){ /* alternate units are inverted: show the CH2OH arm flipping sides */
+      ctx.strokeStyle=COL.hexEdge; ctx.lineWidth=1.4*s;
+      ctx.beginPath(); ctx.moveTo(off, wob+(flip? r: -r)); ctx.lineTo(off, wob+(flip? r+5*s : -r-5*s)); ctx.stroke();
+    }
+  };
+  for(let i=0;i<n;i++){
+    const off=(i-(n-1)/2)*r*1.75;
+    const wob = (!straight && n>2) ? Math.sin(i*1.3+p.rot)*3*s : 0;
+    hexAt(off,wob,i%2===1);
+  }
+  /* branches (amylopectin, glycogen) drawn upward from anchor units */
+  for(const [anch,len] of (p.branches||[])){
+    if (anch>=n) continue;
+    const offA=(anch-(n-1)/2)*r*1.75;
+    const wobA=(!straight && n>2)? Math.sin(anch*1.3+p.rot)*3*s : 0;
+    ctx.strokeStyle=COL.hexEdge; ctx.lineWidth=1.6*s;
+    ctx.beginPath(); ctx.moveTo(offA, wobA-r); ctx.lineTo(offA+r*0.9, wobA-r*1.9); ctx.stroke();
+    for(let j=0;j<len;j++){
+      hexAt(offA+r*0.9+j*r*1.6, wobA-r*2.6-j*r*1.5, false);
+    }
   }
   if (S.show.labels){
     ctx.rotate(-p.rot);
-    ctx.fillStyle=COL.mut; ctx.font=`${10*s}px sans-serif`; ctx.textAlign="center";
-    ctx.fillText(n>=3?"starch":(n===2?"maltose":"glucose"),0,r+13*s);
+    ctx.fillStyle=p.limit?COL.amber:COL.mut; ctx.font=`${10*s}px sans-serif`; ctx.textAlign="center";
+    ctx.fillText(sugarLabel(p),0,r+15*s);
   }
   ctx.restore();
 }
@@ -661,11 +753,14 @@ function drawEnzyme(ctx,e,opts){
       ctx.stroke(); ctx.setLineDash([]);
       if (o.labelBonds){
         const mx=(A.x+B.x)/2, my=(A.y+B.y)/2;
-        const tag=b.type==="H"?"H-bond":(b.type==="ionic"?"ionic":"S–S");
-        const tcol=b.type==="H"?COL.water:(b.type==="ionic"?"#8A63B8":"#8a6d1e");
-        ctx.font="bold 9px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
-        ctx.lineWidth=3; ctx.strokeStyle="rgba(251,248,242,.9)"; ctx.strokeText(tag,mx,my-7);
-        ctx.fillStyle=tcol; ctx.fillText(tag,mx,my-7);
+        const idx=e.bonds.indexOf(b)+1;
+        const tcol=b.type==="H"?COL.water:(b.type==="ionic"?"#8A63B8":"#B08A1E");
+        ctx.setLineDash([]);
+        ctx.fillStyle=tcol; ctx.beginPath(); ctx.arc(mx,my,7.5,0,TAU); ctx.fill();
+        ctx.strokeStyle="#fff"; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle="#fff"; ctx.font="bold 9px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(idx,mx,my+0.5);
+        ctx.textBaseline="alphabetic";
       }
     }
   }
@@ -732,6 +827,7 @@ function drawLab(){
     ctx.strokeStyle=COL.amber; ctx.setLineDash([5,4]); ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.arc(e.x,e.y,46,0,TAU); ctx.stroke(); ctx.setLineDash([]);
   }
+  drawInspector(ctx,w,h);
 }
 
 /* ================= microscope panel ================= */
@@ -769,7 +865,9 @@ function drawScope(){
     ctx.fillText("active site", w/2+52, h/2-8);
   }
   nameEl.textContent = enzymeLabel(e) + (e.uses ? ` · ${e.uses} reaction${e.uses>1?"s":""} catalysed` : "");
-  const rows = e.bonds.map(b=>{
+  const rows = e.bonds.map((b,bi)=>{
+    const chipCol=b.type==="H"?COL.water:(b.type==="ionic"?"#8A63B8":"#B08A1E");
+    const chip=`<span class="numchip" style="background:${chipCol}">${bi+1}</span>`;
     const label=b.type==="H"?"hydrogen bond":(b.type==="ionic"?"ionic bond":"disulfide bond (covalent)");
     const sym=b.type==="H"
       ? `<svg class="sym" viewBox="0 0 34 12"><line x1="1" y1="6" x2="33" y2="6" stroke="${COL.water}" stroke-width="2.5" stroke-dasharray="4 3"/></svg>`
@@ -777,7 +875,7 @@ function drawScope(){
       ? `<svg class="sym" viewBox="0 0 34 12"><line x1="1" y1="6" x2="33" y2="6" stroke="#8A63B8" stroke-width="3" stroke-dasharray="2 4"/></svg>`
       : `<svg class="sym" viewBox="0 0 34 12"><line x1="1" y1="6" x2="33" y2="6" stroke="${COL.beadCys}" stroke-width="4"/></svg>`;
     const state=b.intact?`<span class="state ok">intact</span>`:`<span class="state bad">${b.permanent?"broken":"broken*"}</span>`;
-    return `<li>${sym}${label}${state}</li>`;
+    return `<li>${chip}${sym}${label}${state}</li>`;
   });
   rows.push(`<li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="rgba(214,185,140,.5)"/></svg>hydrophobic core (inside)<span class="state ${e.unfold<0.4?'ok':'bad'}">${e.unfold<0.4?"tucked in":"exposed"}</span></li>`);
   list.innerHTML=rows.join("");
@@ -789,10 +887,13 @@ function drawScope(){
 
 /* ================= chart ================= */
 function counts(){
-  let st=0,ma=0,gl=0;
+  let st=0,gy=0,ma=0,gl=0;
   for(const p of S.particles){ if(p.kind!=="sugar")continue;
-    if(p.units>=3)st++; else if(p.units===2)ma++; else gl++; }
-  return {st,ma,gl};
+    if(p.stype==="amylose"||p.stype==="amylopectin")st++;
+    else if(p.stype==="glycogen")gy++;
+    else if(p.stype==="maltose")ma++;
+    else if(p.stype==="glucose")gl++; }
+  return {st,gy,ma,gl};
 }
 function sampleChart(){
   if (S.t - S.chart.lastSample < 0.25) return;
@@ -801,6 +902,7 @@ function sampleChart(){
   S.chart.data.push({t:S.t, ...c});
   if (S.chart.data.length>2000) S.chart.data.shift();
   document.getElementById("vStarch").textContent=c.st;
+  document.getElementById("vGlycogen").textContent=c.gy;
   document.getElementById("vMaltose").textContent=c.ma;
   document.getElementById("vGlucose").textContent=c.gl;
   document.getElementById("wUsed").textContent=S.waterUsed;
@@ -814,7 +916,7 @@ function drawChart(){
   const win=90;
   const t1=Math.max(S.t,win), t0=t1-win;
   const view=data.filter(d=>d.t>=t0-1);
-  let maxY=5; for(const d of view) maxY=Math.max(maxY,d.st,d.ma,d.gl);
+  let maxY=5; for(const d of view) maxY=Math.max(maxY,d.st,d.gy||0,d.ma,d.gl);
   maxY=Math.ceil(maxY/5)*5;
   const X=t=>padL+(t-t0)/(t1-t0)*(w-padL-padR);
   const Y=v=>h-padB-(v/maxY)*(h-padT-padB);
@@ -830,7 +932,7 @@ function drawChart(){
   ctx.fillStyle=COL.mut; ctx.textAlign="left"; ctx.fillText("molecules", padL, 10);
   /* series */
   drawChart._placed=[];
-  const series=[["st",COL.starch,"starch"],["ma",COL.maltose,"maltose"],["gl",COL.glucose,"glucose"]];
+  const series=[["st",COL.starch,"starch"],["gy",COL.sGlycogen,"glycogen"],["ma",COL.maltose,"maltose"],["gl",COL.glucose,"glucose"]];
   for(const [k,col,name] of series){
     if (S.chart.hidden[name]) continue;
     ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath();
@@ -851,7 +953,7 @@ function drawChart(){
     let best=view[0]; for(const d of view) if (Math.abs(d.t-tx)<Math.abs(best.t-tx)) best=d;
     ctx.strokeStyle="rgba(36,31,27,.35)"; ctx.setLineDash([3,3]);
     ctx.beginPath(); ctx.moveTo(X(best.t),padT); ctx.lineTo(X(best.t),h-padB); ctx.stroke(); ctx.setLineDash([]);
-    const tip=`t=${best.t.toFixed(0)}s  starch ${best.st} · maltose ${best.ma} · glucose ${best.gl}`;
+    const tip=`t=${best.t.toFixed(0)}s  starch ${best.st} · glycogen ${best.gy||0} · maltose ${best.ma} · glucose ${best.gl}`;
     ctx.font="10.5px sans-serif";
     const tw=ctx.measureText(tip).width+10;
     let bx=clamp(X(best.t)+8,padL,w-padR-tw);
@@ -915,6 +1017,7 @@ function beginCondensation(code){
 }
 const REACT_DUR=4.4;
 function stepBuild(dt){
+  if (S.ex && S.ex!=="polypeptide"){ stepBondEx(dt); return; }
   const b=S.build;
   if (b.anim){
     if (b.anim.flash){ b.anim.flash.t-=dt; if (b.anim.flash.t<=0) b.anim.flash=null; }
@@ -1110,6 +1213,7 @@ function drawBuild(){
     }
     return;
   }
+  if (S.ex && S.ex!=="polypeptide"){ drawBondEx(ctx,w,h); return; }
   if (b.anim){ drawCloseup(ctx,w,h,b); return; }
   /* chain layout — scaled up while the chain is short */
   const n=b.chain.length;
@@ -1165,11 +1269,561 @@ function drawBuild(){
   }
 }
 
+/* ================= chemical drawing (Haworth) ================= */
+function drawHaworth(ctx,cx,cy,sc,o){
+  o=o||{};
+  const f=o.flip?-1:1;
+  const R=26*sc;
+  const ux=[1,0.5,-0.5,-1,-0.5,0.5], uy=[0,0.87,0.87,0,-0.87,-0.87];
+  /* order: C1(right), C2, C3, C4(left), C5(top-left), Oring(top-right) */
+  const pts=ux.map((_,i)=>({x:cx+ux[i]*R, y:cy+uy[i]*R*f}));
+  ctx.strokeStyle=COL.ink; ctx.lineWidth=1.7*Math.min(sc,1.4);
+  ctx.beginPath();
+  for(let i=0;i<6;i++){const a=pts[i],b=pts[(i+1)%6]; if(i===0)ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);}
+  ctx.closePath(); ctx.stroke();
+  /* ring O */
+  ctx.fillStyle="#E07A5F"; ctx.beginPath(); ctx.arc(pts[5].x,pts[5].y,7*sc,0,TAU); ctx.fill();
+  ctx.strokeStyle="rgba(36,31,27,.4)"; ctx.lineWidth=1; ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.font=`bold ${8.5*sc}px sans-serif`; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText("O",pts[5].x,pts[5].y+0.5);
+  /* carbon dots + numbers */
+  for(let i=0;i<5;i++){
+    ctx.fillStyle=COL.ink; ctx.beginPath(); ctx.arc(pts[i].x,pts[i].y,2.6*sc,0,TAU); ctx.fill();
+    if (o.nums!==false){
+      ctx.fillStyle=COL.mut; ctx.font=`${8*sc}px sans-serif`;
+      const off=(i===0)?{x:10*sc,y:-8*sc*f}:(i===3?{x:-11*sc,y:-8*sc*f}:{x:0,y:(i===1||i===2? 13*sc*f : -13*sc*f)});
+      ctx.fillText(i+1, pts[i].x+off.x, pts[i].y+off.y);
+    }
+  }
+  /* CH2OH on C5 (carbon 6) */
+  const c6y=pts[4].y-16*sc*f;
+  ctx.strokeStyle=COL.ink; ctx.beginPath(); ctx.moveTo(pts[4].x,pts[4].y); ctx.lineTo(pts[4].x,c6y); ctx.stroke();
+  if (!o.hideC6text){
+    ctx.fillStyle=COL.ink; ctx.font=`${9.5*sc}px sans-serif`;
+    ctx.fillText("CH₂OH", pts[4].x, c6y-7*sc*f);
+  }
+  /* C1 OH: alpha=below ring (same side f), beta=above */
+  const dirC1 = (o.beta? -1 : 1)*f;
+  const ohy=pts[0].y+16*sc*dirC1;
+  if (!o.hideC1OH){
+    ctx.strokeStyle=COL.ink; ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); ctx.lineTo(pts[0].x,ohy); ctx.stroke();
+    ctx.fillStyle=o.hiC1?COL.amber:COL.ink; ctx.font=`bold ${9.5*sc}px sans-serif`;
+    ctx.fillText("OH", pts[0].x+2*sc, ohy+9*sc*dirC1);
+    if (o.hiC1){ ctx.strokeStyle=COL.amber; ctx.setLineDash([3,3]); ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(pts[0].x+2*sc, ohy+7*sc*dirC1, 12*sc, 0, TAU); ctx.stroke(); ctx.setLineDash([]); }
+  }
+  /* small OH on C4 (bond site) if free */
+  if (o.showC4OH){
+    ctx.fillStyle=COL.mut; ctx.font=`${8.5*sc}px sans-serif`;
+    ctx.fillText("HO", pts[3].x-13*sc, pts[3].y+3);
+  }
+  ctx.textBaseline="alphabetic";
+  return {C1:pts[0], C4:pts[3], C5:pts[4], Oring:pts[5], C6:{x:pts[4].x,y:c6y}, f, R};
+}
+function glycoBridge(ctx,A,B,label,sc,yLift){
+  const mx=(A.x+B.x)/2, my=(A.y+B.y)/2+(yLift||0);
+  ctx.strokeStyle=COL.ink; ctx.lineWidth=1.7;
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(mx,my); ctx.lineTo(B.x,B.y); ctx.stroke();
+  ctx.fillStyle="#E07A5F"; ctx.beginPath(); ctx.arc(mx,my,6.5*sc,0,TAU); ctx.fill();
+  ctx.strokeStyle="rgba(36,31,27,.4)"; ctx.lineWidth=1; ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.font=`bold ${8*sc}px sans-serif`; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText("O",mx,my+0.5);
+  ctx.textBaseline="alphabetic";
+  if (label){
+    ctx.fillStyle=COL.vir; ctx.font=`bold ${10.5*sc}px sans-serif`;
+    ctx.fillText(label, mx, my+22*sc);
+  }
+  return {x:mx,y:my};
+}
+/* ================= molecule inspector ================= */
+function openInspector(p){ S.inspect={p, view:"simple"}; }
+function inspectorTitle(p){
+  if (p.kind==="enzyme") return enzymeLabel(p);
+  if (p.kind==="inhib") return "competitive inhibitor";
+  return sugarLabel(p);
+}
+const SUGAR_FACTS={
+  glucose:["1 glucose unit — the monomer of all the molecules here","digested here by: nothing (it IS the end product) · used by starch synthase"],
+  maltose:["2 α-glucose units · one α-1,4 glycosidic bond","digested here by: maltase → glucose + glucose"],
+  amylose:["unbranched chain of α-glucose · α-1,4 bonds only · coils into a helix in reality","digested here by: amylase (one maltose per cut)"],
+  amylopectin:["α-glucose chain with branches · α-1,4 along the chain, α-1,6 at branch points","digested here by: amylase — but it stalls at the branches (limit dextrin)"],
+  glycogen:["the animal glucose store · like amylopectin but branched more often","digested here by: amylase — stalls at branches; real cells use extra enzymes"],
+  cellulose:["β-glucose chain · β-1,4 bonds · every second unit inverted → straight fibres","digested here by: NOTHING — no enzyme in this beaker (or in you) cuts β-1,4"]
+};
+function drawInspector(ctx,w,h){
+  const I=S.inspect; if(!I) return;
+  const p=I.p;
+  if (p.kind && !S.particles.includes(p)){ S.inspect=null; return; }
+  const X=34,Y=20,W2=w-68,H2=h-40;
+  ctx.save();
+  ctx.fillStyle="rgba(36,31,27,.35)"; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle="#FFFFFF"; ctx.strokeStyle=COL.rule; ctx.lineWidth=1.5;
+  ctx.fillRect(X,Y,W2,H2); ctx.strokeRect(X,Y,W2,H2);
+  S._ihits=[];
+  /* header */
+  ctx.fillStyle=COL.ink; ctx.font="bold 17px Georgia,serif"; ctx.textAlign="left";
+  ctx.fillText(inspectorTitle(p), X+16, Y+26);
+  /* tabs */
+  const tabs=[["simple","Simple model"],["chem","Chemical 2-D structure"]];
+  let tx=X+W2-330;
+  for(const [id,lab] of tabs){
+    const tw=id==="simple"?96:150;
+    const on=I.view===id;
+    ctx.fillStyle=on?COL.vir:"#FFFFFF"; ctx.strokeStyle=COL.vir; ctx.lineWidth=1.2;
+    ctx.fillRect(tx,Y+8,tw,24); ctx.strokeRect(tx,Y+8,tw,24);
+    ctx.fillStyle=on?"#fff":COL.vir; ctx.font="600 11.5px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(lab,tx+tw/2,Y+24);
+    S._ihits.push({x:tx,y:Y+8,w:tw,h:24,act:id});
+    tx+=tw+8;
+  }
+  /* close */
+  ctx.fillStyle=COL.oxLt||"#F8E9E4"; ctx.fillRect(X+W2-34,Y+8,24,24);
+  ctx.strokeStyle=COL.ox; ctx.strokeRect(X+W2-34,Y+8,24,24);
+  ctx.fillStyle=COL.ox; ctx.font="bold 13px sans-serif"; ctx.textAlign="center"; ctx.fillText("✕",X+W2-22,Y+25);
+  S._ihits.push({x:X+W2-34,y:Y+8,w:24,h:24,act:"close"});
+  ctx.strokeStyle=COL.rule; ctx.beginPath(); ctx.moveTo(X,Y+40); ctx.lineTo(X+W2,Y+40); ctx.stroke();
+  /* body */
+  const cx=X+W2/2, cy=Y+40+(H2-70)/2;
+  if (p.kind==="sugar"){
+    if (I.view==="simple"){
+      const fake={...p, x:cx, y:cy-14, rot:0, branches:p.branches};
+      drawSugar(ctx,fake,2.3);
+      const facts=SUGAR_FACTS[p.stype]||[];
+      ctx.fillStyle=COL.ink; ctx.font="12.5px sans-serif"; ctx.textAlign="center";
+      facts.forEach((f2,i)=>ctx.fillText(f2, cx, Y+H2-64+i*18));
+      if (p.limit){ ctx.fillStyle=COL.amber; ctx.fillText("this one is a LIMIT DEXTRIN — amylase stopped at its α-1,6 branch points", cx, Y+H2-28); }
+    } else {
+      drawSugarChem(ctx,X,Y+40,W2,H2-70,p);
+    }
+  } else if (p.kind==="enzyme"){
+    if (I.view==="simple"){
+      drawEnzyme(ctx,p,{x:cx,y:cy-10,scale:3.1,upright:true,noName:true,labelBonds:!p.denatured&&p.unfold<0.3});
+      ctx.fillStyle=COL.mut; ctx.font="11.5px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("bead colours: teal hydrophilic · tan hydrophobic (core) · red acidic (–) · blue basic (+) · gold cysteine (S)", cx, Y+H2-64);
+      ctx.fillText("numbered chips match the bond list in the side panel · the notch is the active site", cx, Y+H2-46);
+      ctx.fillStyle=p.denatured?COL.ox:COL.vir; ctx.font="bold 12px sans-serif";
+      ctx.fillText(p.denatured?"DENATURED — shape and active site lost":"NATIVE — fold intact", cx, Y+H2-26);
+    } else {
+      drawEnzymeChem(ctx,X,Y+40,W2,H2-70,p);
+    }
+  } else {
+    ctx.fillStyle=COL.ink; ctx.font="13px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("A molecule shaped like the substrate closely enough to sit in the active site —", cx, cy-10);
+    ctx.fillText("blocking it without being changed. Its exact structure varies; the SHAPE is the point (C1.1, HL).", cx, cy+10);
+    drawInhib(ctx,{x:cx,y:cy+60,rot:0});
+  }
+  /* footer disclaimer */
+  ctx.fillStyle=COL.mut; ctx.font="italic 10.5px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("Simplified teaching model — not the molecule’s real shape or full structure. Bond types and linkage geometry are accurate.", cx, Y+H2-8);
+  ctx.restore();
+}
+function drawSugarChem(ctx,X,Y,W2,H2,p){
+  const cx=X+W2/2, cy=Y+H2/2-6;
+  const cap=(lines,col)=>{ ctx.textAlign="center"; ctx.font="12px sans-serif";
+    lines.forEach((l,i)=>{ ctx.fillStyle=(col&&col[i])||COL.ink; ctx.fillText(l, cx, Y+H2-40+i*17); }); };
+  const st=p.stype;
+  if (st==="glucose"){
+    drawHaworth(ctx,cx,cy,1.6,{hiC1:true});
+    cap(["α-glucose — the OH on carbon 1 points DOWN (below the ring).",
+         "In β-glucose it points up: that one difference builds cellulose instead of starch."]);
+  } else if (st==="maltose"){
+    const A=drawHaworth(ctx,cx-72,cy,1.25,{hideC1OH:true});
+    const B=drawHaworth(ctx,cx+72,cy,1.25,{showC4OH:false});
+    glycoBridge(ctx,A.C1,B.C4,"α-1,4 glycosidic bond",1.25,26);
+    cap(["carbon 1 of one glucose — oxygen bridge — carbon 4 of the next.",
+         "Formed by condensation (water out); cut by maltase with water in."]);
+  } else if (st==="amylose"||(st==="amylopectin"&&!(p.branches||[]).length)){
+    const A=drawHaworth(ctx,cx-120,cy,1.05,{hideC1OH:true,nums:false});
+    const B=drawHaworth(ctx,cx,cy,1.05,{hideC1OH:true,nums:false});
+    const C=drawHaworth(ctx,cx+120,cy,1.05,{nums:false});
+    glycoBridge(ctx,A.C1,B.C4,"α-1,4",1.05,20);
+    glycoBridge(ctx,B.C1,C.C4,"α-1,4",1.05,20);
+    ctx.fillStyle=COL.mut; ctx.font="bold 16px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("⋯", cx-180, cy+4); ctx.fillText("⋯", cx+180, cy+4);
+    cap(["amylose: α-1,4 bonds only — an unbranched chain that coils into a helix.",
+         "Real chains run to thousands of units; the dots mean “continues”."]);
+  } else if (st==="amylopectin"||st==="glycogen"){
+    const A=drawHaworth(ctx,cx-120,cy+26,1.0,{hideC1OH:true,nums:false});
+    const B=drawHaworth(ctx,cx,cy+26,1.0,{hideC1OH:true,nums:false});
+    const C=drawHaworth(ctx,cx+120,cy+26,1.0,{nums:false});
+    glycoBridge(ctx,A.C1,B.C4,"α-1,4",1.0,18);
+    glycoBridge(ctx,B.C1,C.C4,"α-1,4",1.0,18);
+    const Br=drawHaworth(ctx,cx-64,cy-78,0.95,{hideC1OH:true,nums:false});
+    glycoBridge(ctx,Br.C1,B.C6,"α-1,6",0.95,10);
+    ctx.fillStyle=COL.mut; ctx.font="bold 15px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("⋯", cx-176, cy+30); ctx.fillText("⋯", cx+176, cy+30); ctx.fillText("⋯", cx-124, cy-82);
+    cap(st==="glycogen"
+      ?["glycogen: α-1,4 chains with α-1,6 branch points every 8–12 units — branchier than amylopectin.","More ends → faster glucose release. Amylase alone stalls at the α-1,6 points."]
+      :["amylopectin: α-1,4 chains with α-1,6 branch points (roughly every 20–30 units in reality).","The branch is why amylase leaves a limit dextrin here."]);
+  } else if (st==="cellulose"){
+    const A=drawHaworth(ctx,cx-120,cy,1.05,{beta:true,hideC1OH:true,nums:false});
+    const B=drawHaworth(ctx,cx,cy,1.05,{beta:true,flip:true,hideC1OH:true,nums:false});
+    const C=drawHaworth(ctx,cx+120,cy,1.05,{beta:true,nums:false});
+    glycoBridge(ctx,A.C1,B.C4,"β-1,4",1.05,-20);
+    glycoBridge(ctx,B.C1,C.C4,"β-1,4",1.05,-20);
+    ctx.fillStyle=COL.amber; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("↑ this unit is INVERTED — every second glucose flips", cx, cy-64);
+    cap(["cellulose: β-glucose, β-1,4 bonds, each unit flipped relative to its neighbours →",
+         "straight chains that H-bond into fibres. No human enzyme (and nothing here) can cut it."]);
+  } else if (st==="maltose"){}
+}
+function drawEnzymeChem(ctx,X,Y,W2,H2,e){
+  const cx=X+W2/2;
+  ctx.fillStyle=COL.ink; ctx.font="bold 12.5px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("The chain itself — amino acids joined by peptide bonds (covalent, untouched by heat or pH here)", cx, Y+18);
+  /* 4-residue segment */
+  ctx.save(); ctx.translate(cx, Y+74); ctx.scale(1.25,1.25); ctx.translate(-cx, -(Y+74));
+  const codes=["Gly","Ala","Ser","Cys"];
+  codes.forEach((c0,i)=>{
+    const x=cx-135+i*90, y=Y+74+(i%2?8:-8);
+    drawResidue(ctx,x,y,c0,i%2===1,null,{showNH:i===0, showOH:i===3});
+    if (i<3){ ctx.strokeStyle=COL.vir; ctx.lineWidth=2.2;
+      ctx.beginPath(); ctx.moveTo(x+30,y); ctx.lineTo(cx-135+(i+1)*90-30, Y+74+((i+1)%2?8:-8)); ctx.stroke(); }
+  });
+  ctx.restore();
+  ctx.fillStyle=COL.vir; ctx.font="bold 10.5px sans-serif";
+  ctx.fillText("peptide bonds", cx, Y+126);
+  /* three interaction cards */
+  const cardY=Y+150, cardH=H2-176, cw=(W2-64)/3;
+  const cards=[
+    {title:"hydrogen bond", col:COL.water, note:"weak · broken by HEAT",
+     draw:(x0,yc)=>{
+       ctx.font="bold 12px sans-serif"; ctx.fillStyle=COL.ink; ctx.textAlign="center";
+       ctx.fillText("Ser  –O–H  ⋯  O=C–", x0+cw/2, yc);
+       ctx.strokeStyle=COL.water; ctx.setLineDash([4,3]); ctx.lineWidth=2;
+       ctx.beginPath(); ctx.moveTo(x0+cw/2-8,yc+8); ctx.lineTo(x0+cw/2+18,yc+8); ctx.stroke(); ctx.setLineDash([]);
+       ctx.fillStyle=COL.mut; ctx.font="10.5px sans-serif";
+       ctx.fillText("a slightly + H attracted to a slightly – O", x0+cw/2, yc+26);
+     }},
+    {title:"ionic bond", col:"#8A63B8", note:"charged R-groups · broken by pH",
+     draw:(x0,yc)=>{
+       ctx.font="bold 12px sans-serif"; ctx.fillStyle=COL.ink; ctx.textAlign="center";
+       ctx.fillText("Asp  –COO⁻  ⋯  ⁺H₃N–  Lys", x0+cw/2, yc);
+       ctx.strokeStyle="#8A63B8"; ctx.setLineDash([2,4]); ctx.lineWidth=2.4;
+       ctx.beginPath(); ctx.moveTo(x0+cw/2-10,yc+8); ctx.lineTo(x0+cw/2+10,yc+8); ctx.stroke(); ctx.setLineDash([]);
+       ctx.fillStyle=COL.mut; ctx.font="10.5px sans-serif";
+       ctx.fillText("opposite charges attract — pH changes the charges", x0+cw/2, yc+26);
+     }},
+    {title:"disulfide bond", col:"#B08A1E", note:"covalent · survives both",
+     draw:(x0,yc)=>{
+       ctx.font="bold 12px sans-serif"; ctx.fillStyle=COL.ink; ctx.textAlign="center";
+       ctx.fillText("Cys  –CH₂–S–S–CH₂–  Cys", x0+cw/2, yc);
+       ctx.strokeStyle="#B08A1E"; ctx.lineWidth=3;
+       ctx.beginPath(); ctx.moveTo(x0+cw/2-12,yc+8); ctx.lineTo(x0+cw/2+12,yc+8); ctx.stroke();
+       ctx.fillStyle=COL.mut; ctx.font="10.5px sans-serif";
+       ctx.fillText("a real covalent bond between two cysteines", x0+cw/2, yc+26);
+     }}
+  ];
+  cards.forEach((c0,i)=>{
+    const x0=X+20+i*(cw+12);
+    ctx.fillStyle="#FBF8F2"; ctx.strokeStyle=c0.col; ctx.lineWidth=1.5;
+    ctx.fillRect(x0,cardY,cw,cardH); ctx.strokeRect(x0,cardY,cw,cardH);
+    ctx.fillStyle=c0.col; ctx.font="bold 11.5px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(c0.title.toUpperCase(), x0+cw/2, cardY+18);
+    c0.draw(x0, cardY+cardH/2-2);
+    ctx.fillStyle=COL.mut; ctx.font="italic 10px sans-serif";
+    ctx.fillText(c0.note, x0+cw/2, cardY+cardH-10);
+  });
+  ctx.fillStyle=COL.mut; ctx.font="11px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("these are the interactions drawn as lines in the Simple view — between R-groups, pinning the fold", cx, Y+142);
+}
+/* ================= bond-builder exercises ================= */
+const EX_LIST=[
+  ["polypeptide","Polypeptide"],["maltose","Maltose · α-1,4"],["starch","Starch + branch"],
+  ["cellulose","Cellulose · β-1,4"],["triglyceride","Triglyceride"],["phospholipid","Phospholipid"]
+];
+const EX_EQ={
+  polypeptide:'amino acid + amino acid <b>→ (condensation) →</b> dipeptide + <span class="water">water</span>',
+  maltose:'glucose + glucose <b>→ (condensation) →</b> maltose + <span class="water">water</span>',
+  starch:'starch chain + glucose <b>→ (condensation) →</b> longer starch + <span class="water">water</span> · α-1,4 on the chain, α-1,6 at the branch',
+  cellulose:'β-glucose + β-glucose (inverted) <b>→ (condensation) →</b> cellulose chain + <span class="water">water</span>',
+  triglyceride:'glycerol + 3 fatty acids <b>→ (condensation ×3) →</b> triglyceride + 3 <span class="water">water</span>',
+  phospholipid:'glycerol + 2 fatty acids + phosphate <b>→ (condensation ×3) →</b> phospholipid + 3 <span class="water">water</span>'
+};
+function newBondEx(ex){
+  const steps={maltose:1, starch:2, cellulose:1, triglyceride:3, phospholipid:3}[ex];
+  return {ex, steps, step:0, phase:"pick", picked:{L:false,R:false}, flash:null, t:0,
+    waters:0, flipped:false, hits:[], btns:[], react:null, complete:false};
+}
+const REACT2=3.6;
+function stepBondEx(dt){
+  const st=S.bx; if(!st) return;
+  if (st.flash){ st.flash.t-=dt; if(st.flash.t<=0) st.flash=null; }
+  if (st.phase==="react"){
+    st.t+=dt;
+    if (st.t>=REACT2){
+      st.step++; st.waters++; st.phase="pick"; st.picked={L:false,R:false}; st.react=null; st.flipped=false;
+      document.getElementById("waterCount").textContent=st.waters;
+      if (st.step>=st.steps){ st.complete=true;
+        narrate({maltose:"maltose built — one α-1,4 glycosidic bond, one water released",
+                 starch:"chain extended AND branched — α-1,4 along the chain, α-1,6 at the branch",
+                 cellulose:"cellulose link made — β-1,4, with the incoming glucose inverted",
+                 triglyceride:"triglyceride complete — three ester bonds, three waters",
+                 phospholipid:"phospholipid complete — two fatty acids + a phosphate: one end loves water, the other hides from it"}[st.ex]); }
+    }
+  }
+}
+function drawFattyAcid(ctx,x,y,sc,attached){
+  /* carboxyl head (explicit O-H unless attached) + zigzag tail */
+  ctx.strokeStyle=COL.ink; ctx.lineWidth=1.7;
+  ctx.beginPath(); ctx.moveTo(x-1.5,y-9*sc); ctx.lineTo(x-1.5,y-18*sc); ctx.moveTo(x+2.5,y-9*sc); ctx.lineTo(x+2.5,y-18*sc); ctx.stroke();
+  ctx.fillStyle="#E07A5F"; ctx.beginPath(); ctx.arc(x+0.5,y-22*sc,6*sc,0,TAU); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.font=`bold ${8*sc}px sans-serif`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("O",x+0.5,y-22*sc);
+  ctx.fillStyle=COL.beadAcid; ctx.beginPath(); ctx.arc(x,y,7.5*sc,0,TAU); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.font=`bold ${8.5*sc}px sans-serif`; ctx.fillText("C",x,y);
+  let ohPos=null;
+  if (!attached){
+    ctx.strokeStyle=COL.ink; ctx.beginPath(); ctx.moveTo(x-7.5*sc,y); ctx.lineTo(x-16*sc,y+7*sc); ctx.stroke();
+    ctx.fillStyle="#E07A5F"; ctx.beginPath(); ctx.arc(x-20*sc,y+10*sc,6*sc,0,TAU); ctx.fill();
+    ctx.strokeStyle="rgba(36,31,27,.4)"; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle="#fff"; ctx.font=`bold ${7.5*sc}px sans-serif`; ctx.fillText("O",x-20*sc,y+10*sc);
+    ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(x-29*sc,y+14*sc,5*sc,0,TAU); ctx.fill();
+    ctx.strokeStyle="rgba(36,31,27,.4)"; ctx.stroke();
+    ctx.fillStyle="#3b332c"; ctx.fillText("H",x-29*sc,y+14*sc);
+    ohPos={x:x-24*sc,y:y+12*sc};
+  }
+  /* tail */
+  ctx.strokeStyle=COL.ink; ctx.lineWidth=1.7; ctx.beginPath();
+  let tx=x+7.5*sc, ty=y;
+  ctx.moveTo(tx,ty);
+  for(let i=0;i<6;i++){ tx+=11*sc; ty+= (i%2? -8*sc: 8*sc); ctx.lineTo(tx,ty); }
+  ctx.stroke();
+  ctx.fillStyle=COL.mut; ctx.font=`${8.5*sc}px sans-serif`; ctx.textAlign="left"; ctx.textBaseline="middle";
+  ctx.fillText("…CH₃ (hydrocarbon tail)", tx+4, ty);
+  ctx.textBaseline="alphabetic";
+  return {OH:ohPos, C:{x,y}, tail:{x:tx-30*sc,y:ty}};
+}
+function drawGlycerol(ctx,x,y,sc,used){
+  const pos=[];
+  ctx.fillStyle=COL.ink; ctx.font=`bold ${11*sc}px sans-serif`; ctx.textAlign="center";
+  ctx.fillText("glycerol", x, y-52*sc);
+  for(let i=0;i<3;i++){
+    const cy=y+(i-1)*34*sc;
+    ctx.fillStyle="#8f867c"; ctx.beginPath(); ctx.arc(x,cy,7.5*sc,0,TAU); ctx.fill();
+    ctx.fillStyle="#fff"; ctx.font=`bold ${8.5*sc}px sans-serif`; ctx.textBaseline="middle"; ctx.fillText("C",x,cy);
+    if (i<2){ ctx.strokeStyle=COL.ink; ctx.lineWidth=1.7;
+      ctx.beginPath(); ctx.moveTo(x,cy+7.5*sc); ctx.lineTo(x,cy+34*sc-7.5*sc); ctx.stroke(); }
+    if (used[i]){ pos.push(null); ctx.textBaseline="alphabetic"; continue; }
+    ctx.strokeStyle=COL.ink; ctx.beginPath(); ctx.moveTo(x+7.5*sc,cy); ctx.lineTo(x+16*sc,cy); ctx.stroke();
+    ctx.fillStyle="#E07A5F"; ctx.beginPath(); ctx.arc(x+21*sc,cy,6*sc,0,TAU); ctx.fill();
+    ctx.strokeStyle="rgba(36,31,27,.4)"; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle="#fff"; ctx.font=`bold ${7.5*sc}px sans-serif`; ctx.fillText("O",x+21*sc,cy);
+    ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(x+30*sc,cy,5*sc,0,TAU); ctx.fill();
+    ctx.strokeStyle="rgba(36,31,27,.4)"; ctx.stroke();
+    ctx.fillStyle="#3b332c"; ctx.fillText("H",x+30*sc,cy);
+    pos.push({x:x+30*sc,y:cy});
+    ctx.textBaseline="alphabetic";
+  }
+  return pos;
+}
+function drawPhosphate(ctx,x,y,sc){
+  ctx.fillStyle="#C79A52"; ctx.beginPath(); ctx.arc(x,y,9*sc,0,TAU); ctx.fill();
+  ctx.strokeStyle="rgba(36,31,27,.4)"; ctx.lineWidth=1; ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.font=`bold ${9*sc}px sans-serif`; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText("P",x,y);
+  const os=[[0,-1],[1,0.2],[-1,0.2]];
+  for(const [dx,dy] of os){
+    ctx.strokeStyle=COL.ink; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(x+dx*9*sc,y+dy*9*sc); ctx.lineTo(x+dx*17*sc,y+dy*17*sc); ctx.stroke();
+    ctx.fillStyle="#E07A5F"; ctx.beginPath(); ctx.arc(x+dx*21*sc,y+dy*21*sc,5*sc,0,TAU); ctx.fill();
+    ctx.fillStyle="#fff"; ctx.font=`bold ${7*sc}px sans-serif`; ctx.fillText("O",x+dx*21*sc,y+dy*21*sc);
+  }
+  /* the reactive OH */
+  ctx.strokeStyle=COL.ink; ctx.beginPath(); ctx.moveTo(x,y+9*sc); ctx.lineTo(x,y+17*sc); ctx.stroke();
+  ctx.fillStyle="#E07A5F"; ctx.beginPath(); ctx.arc(x,y+22*sc,6*sc,0,TAU); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.font=`bold ${7.5*sc}px sans-serif`; ctx.fillText("O",x,y+22*sc);
+  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(x+9*sc,y+26*sc,5*sc,0,TAU); ctx.fill();
+  ctx.strokeStyle="rgba(36,31,27,.4)"; ctx.stroke();
+  ctx.fillStyle="#3b332c"; ctx.fillText("H",x+9*sc,y+26*sc);
+  ctx.textBaseline="alphabetic";
+  ctx.fillStyle=COL.mut; ctx.font=`${9*sc}px sans-serif`; ctx.fillText("phosphate", x, y-28*sc);
+  return {OH:{x:x+4*sc,y:y+24*sc}};
+}
+function drawBondEx(ctx,w,h){
+  const st=S.bx;
+  ctx.fillStyle="#FBF8F2"; ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle=COL.rule; ctx.strokeRect(6,6,w-12,h-12);
+  st.hits=[]; st.btns=[];
+  const title={maltose:"Build maltose — the α-1,4 glycosidic bond",
+    starch:["Extend the starch chain — α-1,4","Add a BRANCH — the α-1,6 bond"][st.step]||"",
+    cellulose:"Build a cellulose link — β-1,4 (the flip matters)",
+    triglyceride:`Triglyceride — ester bond ${st.step+1} of 3`,
+    phospholipid:["Phospholipid — ester bond 1 of 2","Phospholipid — ester bond 2 of 2","Phospholipid — attach the PHOSPHATE"][st.step]||""}[st.ex];
+  ctx.fillStyle=COL.ink; ctx.font="bold 18px Georgia,serif"; ctx.textAlign="center";
+  ctx.fillText(st.complete? "Built!" : title, w/2, 42);
+  ctx.fillStyle=st.phase==="react"?COL.vir:COL.mut; ctx.font="13px sans-serif";
+  if (!st.complete) ctx.fillText(st.phase==="react"
+    ? "the –OH and –H leave together as ONE water molecule — the new bond forms"
+    : "click the TWO atoms that leave as water — the –OH from one molecule and the –H from the other", w/2, 66);
+  const reg=(pos,id,ok,msg)=>{ if(pos) st.hits.push({x:pos.x,y:pos.y,r:19,id,ok,msg}); };
+  let bondFrom=null, bondTo=null, bondLabel="";
+  const cy=h/2+16;
+  if (st.ex==="maltose"||st.ex==="starch"||st.ex==="cellulose"){
+    const beta=st.ex==="cellulose";
+    const scl=1.35;
+    const doneRings = st.ex==="starch"? 2+st.step : 1+st.step;
+    const ringGap=118;
+    const baseX=w/2-((doneRings)*ringGap)/2 - 20;
+    let prev=null, mid=null;
+    for(let i=0;i<doneRings;i++){
+      const A=drawHaworth(ctx,baseX+i*ringGap,cy,scl,{beta, flip:beta&&i%2===1, hideC1OH:true, nums:i===doneRings-1, showC4OH:false});
+      if (prev) glycoBridge(ctx,prev.C1,A.C4, beta?"β-1,4":"α-1,4", scl, beta?-24:24);
+      if (i===Math.min(1,doneRings-1)) mid=A;
+      prev=A;
+    }
+    if (st.ex==="starch"&&st.step===1){
+      /* branch task: incoming ring above, joins mid ring's C6 */
+      ctx.strokeStyle=COL.ink; ctx.lineWidth=1.5;
+      ctx.fillStyle=COL.mut; ctx.font="10.5px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("OH", mid.C6.x+12, mid.C6.y-2);
+      const inc=drawHaworth(ctx, mid.C6.x-40, cy-150, 1.2, {hideC1OH:false, hiC1:true, nums:true});
+      reg({x:inc.C1.x+2,y:inc.C1.y+24},"L",true,null);
+      reg({x:mid.C6.x+12,y:mid.C6.y-4},"R",true,null);
+      reg(mid?{x:prev.C1.x,y:prev.C1.y+18}:null,"d1",false,"the chain’s carbon-1 end grows the α-1,4 chain — a BRANCH attaches at carbon 6");
+      reg(inc.Oring,"d2",false,"the ring oxygen stays inside the ring");
+      reg(inc.C6,"d3",false,"that is the incoming glucose’s carbon 6 — the bond forms from its carbon 1");
+      bondFrom=inc.C1; bondTo=mid.C6; bondLabel="α-1,6 glycosidic bond";
+    } else {
+      const inc=drawHaworth(ctx, baseX+doneRings*ringGap+40, cy, scl, {beta, flip:beta&&doneRings%2===1, hiC1:!beta||st.flipped||doneRings%2!==1?true:true, nums:true, showC4OH:false});
+      /* incoming gives its C1–OH; the chain end’s C4–OH gives the H — wait: chain grows at C4 of incoming? Convention: chain C1 + incoming C4. Keep consistent with maltose text: left C1-OH + right C4-H. Incoming is RIGHT: its C4 receives. */
+      ctx.fillStyle=COL.mut; ctx.font="11px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("HO", inc.C4.x-16, inc.C4.y+4);
+      reg({x:prev.C1.x+3,y:prev.C1.y+(beta&&(doneRings-1)%2===1?-24:24)},"L",true,null);
+      reg({x:inc.C4.x-16,y:inc.C4.y},"R",true,null);
+      reg(inc.Oring,"d1",false,"the ring oxygen stays inside the ring — it never leaves");
+      reg(inc.C6,"d2",false, st.ex==="cellulose"?"carbon 6 is not where β-1,4 forms":"carbon 6 is for α-1,6 BRANCHES — this bond is 1,4");
+      reg({x:inc.C1.x+2,y:inc.C1.y+(beta&&doneRings%2===1?-24:24)},"d3",false,"that OH sits on the incoming glucose’s carbon 1 — here the chain’s carbon 1 bonds to the newcomer’s carbon 4");
+      bondFrom=prev.C1; bondTo=inc.C4; bondLabel=beta?"β-1,4 glycosidic bond":"α-1,4 glycosidic bond";
+      if (beta){
+        /* flip button + gate */
+        const bx=w/2-80, by=h-92;
+        ctx.fillStyle=st.flipped?COL.vir:"#FFFFFF"; ctx.strokeStyle=COL.vir; ctx.lineWidth=1.4;
+        ctx.fillRect(bx,by,160,26); ctx.strokeRect(bx,by,160,26);
+        ctx.fillStyle=st.flipped?"#fff":COL.vir; ctx.font="600 12px sans-serif"; ctx.textAlign="center";
+        ctx.fillText(st.flipped?"inverted ✓":"⟲ flip the incoming glucose", bx+80, by+17);
+        st.btns.push({x:bx,y:by,w:160,h:26,act:"flip"});
+      }
+    }
+  } else {
+    /* lipids */
+    const used=[st.step>0, st.step>1, st.ex==="phospholipid"? false : st.step>2];
+    const g=drawGlycerol(ctx, w/2-190, cy, 1.5, [st.step>0, st.step>1, st.step>2 && st.ex==="triglyceride"]);
+    /* attached tails so far */
+    for(let i=0;i<st.step && i<((st.ex==="phospholipid")?2:3); i++){
+      const ay=cy+(i-1)*51;
+      ctx.strokeStyle=COL.vir; ctx.lineWidth=2.2;
+      ctx.beginPath(); ctx.moveTo(w/2-179, ay); ctx.lineTo(w/2-120, ay); ctx.stroke();
+      drawFattyAcid(ctx, w/2-100, ay, 1.15, true);
+      ctx.fillStyle=COL.vir; ctx.font="bold 9.5px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("ester bond", w/2-150, ay-8);
+    }
+    const lastStep = st.ex==="phospholipid" && st.step===2;
+    if (lastStep){
+      const ph=drawPhosphate(ctx, w/2+140, cy-120, 1.4);
+      reg(ph.OH,"L",true,null);
+      const gh=g[2]; reg(gh,"R",true,null);
+      if (g[0]) reg(g[0],"d1",false,"that –OH is free too, but the phosphate goes on the END carbon here (carbon 3)");
+      bondFrom={x:w/2+140,y:cy-96}; bondTo={x:w/2-190+22,y:cy+51}; bondLabel="ester bond (glycerol–phosphate)";
+    } else if (!st.complete){
+      const fa=drawFattyAcid(ctx, w/2+120, cy-120, 1.35, false);
+      reg(fa.OH,"L",true,null);
+      for(let i=0;i<3;i++){ if (g[i]) reg(g[i], "R", true, null); }
+      reg(fa.tail,"d1",false,"the hydrocarbon tail is just C–H — unreactive here; the business end is the carboxyl");
+      reg({x:w/2+120,y:cy-142},"d2",false,"the double-bonded O stays — the –O–H beside it leaves");
+      const freeIdx=g.findIndex(p2=>p2);
+      bondFrom={x:w/2+120,y:cy-120}; bondTo=g[freeIdx]?{x:g[freeIdx].x-24,y:g[freeIdx].y}:null; bondLabel="ester bond";
+    }
+    ctx.fillStyle=COL.mut; ctx.font="11px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(st.ex==="phospholipid"?"2 fatty acids + 1 phosphate → amphipathic (B1.1.9, B1.1.12)":"3 fatty acids, 3 ester bonds (B1.1.9)", w/2, h-30);
+  }
+  /* pick rings */
+  if (st.phase==="pick" && !st.complete){
+    for(const ht of st.hits){
+      const chosen=(ht.id==="L"&&st.picked.L)||(ht.id==="R"&&st.picked.R&&st.pickedRpos&&Math.abs(st.pickedRpos.x-ht.x)<2);
+      ctx.beginPath(); ctx.arc(ht.x,ht.y,ht.r,0,TAU);
+      if ((ht.id==="L"&&st.picked.L)||(ht.id==="R"&&st.picked.R&&st.pickedRpos&&Math.hypot(st.pickedRpos.x-ht.x,st.pickedRpos.y-ht.y)<3)){
+        ctx.strokeStyle=COL.green; ctx.lineWidth=3; ctx.setLineDash([]);
+      } else { ctx.strokeStyle="rgba(110,101,92,.4)"; ctx.lineWidth=1.2; ctx.setLineDash([3,4]); }
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+    ctx.fillStyle=COL.mut; ctx.font="11px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(`chosen: ${st.picked.L?"the –OH ✓":"…"}  +  ${st.picked.R?"the –H ✓":"…"}`, w/2, 90);
+  }
+  /* react animation */
+  if (st.phase==="react" && st.react){
+    const t=st.t, A=st.react.A, B=st.react.B;
+    const mx=(A.x+B.x)/2, topY=Math.min(A.y,B.y)-56;
+    if (t<1.1){ const k=t/1.1;
+      ctx.fillStyle="#E07A5F"; ctx.beginPath(); ctx.arc(lerp(A.x,mx-7,k),lerp(A.y,topY,k),9,0,TAU); ctx.fill();
+      ctx.fillStyle="#fff"; ctx.font="bold 9px sans-serif"; ctx.textBaseline="middle"; ctx.textAlign="center";
+      ctx.fillText("O–H",lerp(A.x,mx-7,k),lerp(A.y,topY,k));
+      ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(lerp(B.x,mx+9,k),lerp(B.y,topY,k),7,0,TAU); ctx.fill();
+      ctx.strokeStyle="rgba(36,31,27,.45)"; ctx.stroke();
+      ctx.fillStyle="#3b332c"; ctx.fillText("H",lerp(B.x,mx+9,k),lerp(B.y,topY,k));
+      ctx.textBaseline="alphabetic";
+    } else { const k=clamp((t-1.1)/1.6,0,1);
+      droplet(ctx,mx,topY-55*k,10,1-0.25*k);
+      ctx.fillStyle=COL.water; ctx.font="bold 12px sans-serif"; ctx.textAlign="left";
+      ctx.fillText("H₂O — condensation", mx+15, topY-55*k+4); ctx.textAlign="center";
+    }
+    if (t>1.9 && st.react.from && st.react.to){
+      const k=clamp((t-1.9)/1.5,0,1);
+      ctx.strokeStyle=COL.vir; ctx.lineWidth=3.5;
+      ctx.beginPath(); ctx.moveTo(st.react.from.x,st.react.from.y);
+      ctx.lineTo(lerp(st.react.from.x,st.react.to.x,k), lerp(st.react.from.y,st.react.to.y,k)); ctx.stroke();
+      if (k>0.6){ ctx.fillStyle=COL.vir; ctx.font="bold 12px sans-serif"; ctx.textAlign="center";
+        ctx.fillText(st.react.label.toUpperCase(), w/2, 108); }
+    }
+  }
+  st._bond={from:bondFrom,to:bondTo,label:bondLabel};
+  if (st.complete){
+    ctx.fillStyle=COL.green; ctx.font="bold 15px sans-serif"; ctx.textAlign="center";
+    ctx.fillText({maltose:"MALTOSE — 1 α-1,4 bond · 1 H₂O released",
+      starch:"STARCH GREW AND BRANCHED — α-1,4 + α-1,6 · 2 H₂O released",
+      cellulose:"CELLULOSE LINK — β-1,4, units inverted · 1 H₂O released",
+      triglyceride:"TRIGLYCERIDE — 3 ester bonds · 3 H₂O released",
+      phospholipid:"PHOSPHOLIPID — 2 ester bonds + phosphate · 3 H₂O released"}[st.ex], w/2, 92);
+  }
+  if (st.flash){
+    ctx.fillStyle="rgba(154,42,22,.94)"; ctx.font="12.5px sans-serif"; ctx.textAlign="center";
+    const tw2=Math.min(w-60, ctx.measureText(st.flash.msg).width+26);
+    ctx.fillRect(w/2-tw2/2, h-64, tw2, 24);
+    ctx.fillStyle="#fff"; ctx.fillText(st.flash.msg, w/2, h-47);
+  }
+}
+function bondExClick(x,y){
+  const st=S.bx; if(!st||st.complete||st.phase!=="pick") return;
+  for(const b of st.btns){ if (x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h){
+    if (b.act==="flip"){ st.flipped=!st.flipped; narrate(st.flipped?"incoming glucose inverted — now it can sit β-1,4 against its neighbour":"flipped back"); }
+    return; } }
+  let hit=null;
+  for(const ht of st.hits){ if (Math.hypot(x-ht.x,y-ht.y)<=ht.r){ hit=ht; break; } }
+  if (!hit) return;
+  if (st.ex==="cellulose" && hit.ok && !st.flipped){
+    st.flash={msg:"in cellulose every unit is INVERTED relative to its neighbour — flip the incoming glucose first (β-1,4)", t:3.4};
+    narrate(st.flash.msg, true); return;
+  }
+  if (hit.ok){
+    if (hit.id==="L"){ st.picked.L=true; st.pickedLpos={x:hit.x,y:hit.y}; }
+    if (hit.id==="R"){ st.picked.R=true; st.pickedRpos={x:hit.x,y:hit.y}; }
+    if (st.picked.L && st.picked.R){
+      st.phase="react"; st.t=0;
+      st.react={A:st.pickedLpos, B:st.pickedRpos, from:st._bond.from, to:st._bond.to, label:st._bond.label};
+      narrate("both leaving atoms chosen — condensation runs: –OH + –H → H₂O");
+    } else narrate(st.picked.L?"the –OH ✓ — now the –H on the other molecule":"the –H ✓ — now the –OH that leaves the other molecule");
+  } else {
+    st.flash={msg:hit.msg, t:3.4}; narrate(hit.msg, true);
+  }
+}
 /* ================= UI wiring ================= */
 function buildCounters(){
   const wrap=document.getElementById("counters");
   const defs=[
-    ["starch","starch (chain of glucose)","#E8C77E"],
+    ["amylose","amylose — unbranched starch","#E8C77E"],
+    ["amylopectin","amylopectin — branched starch","#E8C77E"],
+    ["glycogen","glycogen — animal store, more branches","#E8C77E"],
+    ["cellulose","cellulose — β-1,4, plant cell walls","#E8C77E"],
+    ["maltose","maltose","#E8C77E"],
     ["glucose","glucose","#E8C77E"],
     ["amylase","amylase",COL.vir],
     ["maltase","maltase","#1E5AA8"],
@@ -1260,8 +1914,9 @@ function setMode(mode){
   document.getElementById("buildTray").style.display=lab?"none":"";
   document.getElementById("wordEq").style.display=lab?"none":"";
   document.getElementById("stageHint").textContent = lab
-    ? "Click an enzyme to enlarge it under the microscope → · shapes are simplified cartoons — press ? for what is real"
-    : "Drag an amino acid from the tray to the chain's carboxyl end — the gene decides the order.";
+    ? "Click ANY molecule or enzyme to open the large inspector (Simple / Chemical views) · shapes are simplified — see “What is real?”"
+    : (S._exHint || "Drag an amino acid from the tray to the chain's carboxyl end — the gene decides the order.");
+  document.getElementById("stageHint").style.visibility="visible";
   document.querySelector("aside.right").style.display = "";
   if (mode==="build" && !S.build){ S.build=newBuild(); refreshBuildUI(); }
   if (mode==="build"){ document.getElementById("scopeName").textContent="";
@@ -1298,6 +1953,39 @@ function loop(now){
 /* ================= events ================= */
 window.addEventListener("load",()=>{
   buildCounters(); buildToggles(); buildKey(); buildAAButtons();
+  S.ex="polypeptide";
+  const exWrap=document.getElementById("exButtons");
+  exWrap.innerHTML=EX_LIST.map(([id,lab])=>`<button class="tbtn exbtn" data-ex="${id}" style="font-size:11.5px;padding:6px 8px">${lab}</button>`).join("");
+  const setEx=(id)=>{
+    S.ex=id;
+    document.querySelectorAll(".exbtn").forEach(b=>{
+      b.classList.toggle("primary", b.dataset.ex===id);
+    });
+    const poly=id==="polypeptide";
+    document.getElementById("seqTrack").style.display=poly?"":"none";
+    document.getElementById("aaButtons").style.display=poly?"":"none";
+    document.getElementById("btnExRestart").style.display=poly?"none":"";
+    document.getElementById("btnFold").style.display= poly&&S.build.complete&&!S.build.folding&&S.build.folded<1 ?"inline-block":"none";
+    document.getElementById("btnToLab").style.display= poly&&S.build.folded>=1 ?"inline-block":"none";
+    if (!poly){ S.bx=newBondEx(id); document.getElementById("waterCount").textContent=0; }
+    else document.getElementById("waterCount").textContent=S.build.water;
+    document.getElementById("wordEq").firstChild && (document.getElementById("wordEq").innerHTML=
+      EX_EQ[id]+' &nbsp;·&nbsp; <span id="waterCount">'+(poly?S.build.water:(S.bx?S.bx.waters:0))+'</span> <span class="water">H₂O released</span>');
+    const hints={polypeptide:"Drag an amino acid from the tray to the chain’s carboxyl end — the gene decides the order.",
+      maltose:"Two α-glucose molecules. Click the –OH on the left glucose’s carbon 1, and the –H of the hydroxyl on the right glucose’s carbon 4.",
+      starch:"First extend the chain (α-1,4), then add the branch (α-1,6 — carbon 6).",
+      cellulose:"β-glucose: flip the incoming unit first, then pick the leaving atoms.",
+      triglyceride:"Ester bonds: the fatty acid’s carboxyl –OH + an –H from one of glycerol’s three hydroxyls. Three times.",
+      phospholipid:"Two fatty acids, then the phosphate takes the third position."};
+    S._exHint=hints[id];
+    if (S.mode==="build"){
+      document.getElementById("stageHint").textContent=hints[id];
+      document.getElementById("stageHint").style.visibility="visible";
+    }
+  };
+  exWrap.querySelectorAll(".exbtn").forEach(b=>b.addEventListener("click",()=>setEx(b.dataset.ex)));
+  document.getElementById("btnExRestart").addEventListener("click",()=>{ if(S.ex!=="polypeptide"){ S.bx=newBondEx(S.ex); document.getElementById("waterCount").textContent=0; }});
+  setTimeout(()=>setEx("polypeptide"),0);
   document.getElementById("tSlider").addEventListener("input",e=>{
     S.T=+e.target.value; document.getElementById("tOut").textContent=S.T+" °C";
     document.getElementById("trow").classList.toggle("hot",S.T>45);
@@ -1338,6 +2026,7 @@ window.addEventListener("load",()=>{
     const r=world().getBoundingClientRect();
     const x=ev.clientX-r.left, y=ev.clientY-r.top;
     if (S.mode==="build"){
+      if (S.ex && S.ex!=="polypeptide"){ bondExClick(x,y); return; }
       const b=S.build;
       if (b && b.anim && b.anim.phase==="closeup"){
         let hit=null;
@@ -1360,10 +2049,31 @@ window.addEventListener("load",()=>{
       }
       return;
     }
+    if (S.inspect){
+      let acted=false;
+      for(const ht of (S._ihits||[])){
+        if (x>=ht.x&&x<=ht.x+ht.w&&y>=ht.y&&y<=ht.y+ht.h){
+          if (ht.act==="close") S.inspect=null;
+          else S.inspect.view=ht.act;
+          acted=true; break;
+        }
+      }
+      if (!acted && (x<34||x>world().getBoundingClientRect().width-34)) S.inspect=null;
+      return;
+    }
     let best=null,bd=1e9;
-    for(const p of S.particles){ if(p.kind!=="enzyme")continue;
+    for(const p of S.particles){
       const d=(p.x-x)**2+(p.y-y)**2; if(d<bd){bd=d;best=p;} }
-    if (best && bd<70*70) S.scopeTarget=best;
+    if (best && bd<70*70){
+      if (best.kind==="enzyme") S.scopeTarget=best;
+      openInspector(best);
+    }
+  });
+  document.getElementById("btnInspect").addEventListener("click",()=>{
+    if (S.mode==="lab" && S.scopeTarget) openInspector(S.scopeTarget);
+  });
+  document.getElementById("scopeCanvas").addEventListener("click",()=>{
+    if (S.mode==="lab" && S.scopeTarget) openInspector(S.scopeTarget);
   });
   const cc=document.getElementById("chartCanvas");
   cc.addEventListener("mousemove",ev=>{
