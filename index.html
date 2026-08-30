@@ -20,9 +20,11 @@
   }
   h1,h2,h3,.serif{font-family:Georgia,"Times New Roman",serif}
   header{
-    background:var(--panel); border-bottom:1px solid var(--rule);
+    background:var(--ink); border-bottom:3px solid var(--vir);
     padding:10px 18px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;
   }
+  header h1{color:#F4EFE7}
+  header .sub{color:#CFC6B8}
   header .titleblock{margin-right:auto}
   header h1{font-size:21px; font-weight:700}
   header .sub{color:var(--mut); font-size:11.5px; letter-spacing:.04em}
@@ -30,27 +32,40 @@
   .chip{font-size:10px; font-weight:700; letter-spacing:.08em; padding:3px 8px; border-radius:2px}
   .chip.b12{background:var(--vir); color:#fff}
   .chip.c11{background:var(--amber); color:#fff}
-  .tabs{display:flex; gap:0; border:1px solid var(--vir); border-radius:3px; overflow:hidden}
+  .tabs{display:flex; gap:4px; background:#3A332B; border-radius:5px; padding:4px}
   .tabs button{
-    border:0; background:var(--panel); color:var(--vir); font:600 13px inherit;
-    padding:9px 16px; cursor:pointer; font-family:inherit;
+    border:0; background:transparent; color:#A79D8F; font:600 13px inherit;
+    padding:8px 14px; cursor:pointer; font-family:inherit; border-radius:3px;
   }
+  .tabs button:hover{color:#E5DFD5}
   .tabs button.active{background:var(--vir); color:#fff}
   .transport{display:flex; align-items:center; gap:8px}
-  .timer{font:700 16px "SF Mono",Menlo,Consolas,monospace; background:var(--ink); color:#F4EFE7;
-    padding:6px 10px; border-radius:3px; min-width:86px; text-align:center}
+  .timer{font:700 16px "SF Mono",Menlo,Consolas,monospace; background:#0B0906; color:#E0B36A;
+    padding:6px 10px; border-radius:3px; min-width:86px; text-align:center; border:1px solid #4A4237}
   .tbtn{border:1px solid var(--rule); background:var(--panel); border-radius:3px; padding:8px 12px;
     cursor:pointer; font:600 13px inherit; font-family:inherit; color:var(--ink)}
   .tbtn:hover{border-color:var(--vir)}
+  header .tbtn{background:#3A332B; border-color:#4A4237; color:#E5DFD5}
+  header .tbtn:hover{border-color:var(--vir); color:#fff}
+  header .tbtn.warn{color:#F0A48E; border-color:#7a4032}
+  header select.tbtn option{color:#241F1B; background:#fff}
   .tbtn.primary{background:var(--vir); border-color:var(--vir); color:#fff}
   .tbtn.warn{color:var(--ox); border-color:var(--ox)}
   select.tbtn{padding:8px 6px}
   main{flex:1; display:grid; grid-template-columns:252px 1fr 300px; gap:12px; padding:12px 18px; align-items:stretch; min-height:0}
-  .card{background:var(--panel); border:1px solid var(--rule); border-radius:4px}
-  .card h3{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--mut);
-    padding:9px 12px 7px; border-bottom:1px solid var(--rule)}
+  .card{background:var(--panel); border:1px solid var(--rule); border-radius:5px;
+    box-shadow:0 1px 2px rgba(36,31,27,.05)}
+  .card h3{font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink);
+    padding:9px 12px 8px; border-bottom:1px solid var(--rule); background:var(--oat);
+    border-radius:5px 5px 0 0; display:flex; align-items:center; gap:7px}
+  .card h3::before{content:""; width:8px; height:8px; background:var(--vir); border-radius:2px; flex:0 0 8px}
   .card .body{padding:10px 12px}
-  aside.left{display:flex; flex-direction:column; gap:12px; overflow-y:auto}
+  aside.left{display:flex; flex-direction:column; gap:12px; overflow-y:auto;
+    scrollbar-width:thin; scrollbar-color:var(--rule) transparent; padding:2px 4px 26px 2px}
+  aside.left::-webkit-scrollbar, aside.right::-webkit-scrollbar{width:9px}
+  aside.left::-webkit-scrollbar-thumb, aside.right::-webkit-scrollbar-thumb{
+    background:var(--rule); border-radius:5px; border:2px solid var(--oat)}
+  aside.left::-webkit-scrollbar-track, aside.right::-webkit-scrollbar-track{background:transparent}
   .sliderrow{margin:6px 0 12px}
   .sliderrow label{display:flex; justify-content:space-between; font-weight:600; font-size:13px}
   .sliderrow label output{font-weight:700; color:var(--vir); font-variant-numeric:tabular-nums}
@@ -74,7 +89,8 @@
   .stage canvas{position:absolute; inset:0; width:100%; height:100%}
   canvas{display:block; width:100%; height:100%}
   .stage .hint{position:absolute; left:12px; bottom:10px; color:var(--mut); font-size:11px; font-style:italic; pointer-events:none}
-  aside.right{display:flex; flex-direction:column; gap:12px; overflow-y:auto}
+  aside.right{display:flex; flex-direction:column; gap:12px; overflow-y:auto;
+    scrollbar-width:thin; scrollbar-color:var(--rule) transparent; padding:2px 2px 26px 4px}
   #scopeCanvas{width:100%; height:250px}
   .bondlist{list-style:none; font-size:12px}
   .bondlist li{display:flex; align-items:center; gap:8px; padding:4px 0; border-bottom:1px dashed var(--rule)}
@@ -87,6 +103,16 @@
   .status.stressed{background:var(--amberLt); color:var(--amber)}
   .status.denatured{background:var(--oxLt); color:var(--ox)}
   footer.graph{padding:0 18px 14px}
+  .gheader{display:flex; align-items:center; justify-content:space-between;
+    padding:7px 12px; background:var(--oat); border-bottom:1px solid var(--rule); border-radius:5px 5px 0 0}
+  .gheader .gtitle{font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:700;
+    display:flex; align-items:center; gap:7px}
+  .gheader .gtitle::before{content:""; width:8px; height:8px; background:var(--amber); border-radius:2px}
+  .gheader button{border:1px solid var(--rule); background:#fff; border-radius:3px; padding:3px 10px;
+    font:600 11px inherit; font-family:inherit; cursor:pointer; color:var(--mut)}
+  .gheader button:hover{border-color:var(--vir); color:var(--vir)}
+  footer.graph.min .graphcard{display:none}
+  footer.graph.min .gheader{border-bottom:none; border-radius:5px}
   .graphcard{display:grid; grid-template-columns:1fr 190px; gap:0}
   #chartCanvas{width:100%; height:170px}
   .glegend{border-left:1px solid var(--rule); padding:10px 12px; font-size:12px}
@@ -241,7 +267,12 @@
 </main>
 
 <footer class="graph" id="graphWrap">
-  <div class="card graphcard">
+  <div class="card">
+  <div class="gheader">
+    <span class="gtitle">Concentration — molecules over time</span>
+    <button id="btnGraphMin">▾ minimize</button>
+  </div>
+  <div class="graphcard">
     <canvas id="chartCanvas"></canvas>
     <div class="glegend" id="gLegend">
       <div style="font-weight:700; margin-bottom:2px">Concentration <span style="color:var(--mut); font-weight:400">(molecules)</span></div>
@@ -253,6 +284,7 @@
       <div class="muted">click a row to hide/show · hover the graph to read values</div>
       <div class="foot">cellulose is not plotted: nothing in this beaker can cut its β-1,4 bonds, so its count never changes.</div>
     </div>
+  </div>
   </div>
 </footer>
 <div class="footerline">
@@ -372,38 +404,40 @@ function droplet(ctx,x,y,r,alpha){
 /* ================= enzyme fold templates =================
    16 beads. types: p=hydrophilic, o=hydrophobic, a=acidic(-), b=basic(+), c=cysteine */
 function makeFoldTemplate(kind){
-  // native positions: hand-made blob with an active-site notch on the right side
-  const N=16, native=[], unfolded=[];
-  // base ring-ish fold
-  const seedByKind={amylase:1.1, maltase:2.3, synthase:4.1, champion:2.3};
-  const seed=seedByKind[kind]||0;
+  const N=16, native=[], display=[], unfolded=[];
+  const seed={amylase:1.1, maltase:2.3, synthase:4.1, champion:2.3}[kind]||0;
+  /* NATIVE (beaker): compact hairpin — indices 0..7 across the top, 8..15 back along the bottom,
+     so each bonded pair (i, 15−i) sits close. Active-site mouth = the right-hand turn (6,7,8,9). */
   for(let i=0;i<N;i++){
-    const a = (i/N)*TAU*1.35 + seed;
-    const rr = 20 + 9*Math.sin(i*1.7+seed) ;
-    native.push({x: Math.cos(a)*rr, y: Math.sin(a)*rr*0.82});
+    const t=(i<8? i : 15-i)/7;
+    const x=lerp(-27,25,t)+Math.sin(i*2.1+seed)*2.5;
+    const y=(i<8? -13 : 13)+Math.sin(i*1.3+seed)*3;
+    native.push({x,y});
   }
-  // carve an active-site notch on the right: push beads 4..7 outward to form a pocket
-  const mouth = {amylase:16, maltase:13, synthase:15, champion:13}[kind]||14;
-  native[4]={x:mouth+8,y:-13}; native[5]={x:mouth+2,y:-5};
-  native[6]={x:mouth+2,y:5};  native[7]={x:mouth+8,y:13};
-  // hydrophobic residues sit in the CORE of the fold (a huddle on the surface would still be wet)
-  [0,1,9,12].forEach((bi,k)=>{ const a=k*TAU/4+0.7+seed;
-    native[bi]={x:Math.cos(a)*6-3, y:Math.sin(a)*5}; });
-  for(let i=0;i<N;i++){
-    unfolded.push({x:(i-N/2)*7.5, y: Math.sin(i*1.9)*10});
-  }
-  const types = ["o","o","p","b","p","p","p","p","a","o","c","p","o","b","c","p"];
-  // bonds: 3 H-bonds (p..p), 1 ionic (a..b), 1 disulfide (c..c); hydrophobic cluster beads 0,1,9,12
+  const mouth={amylase:20, maltase:15, synthase:18, champion:15}[kind]||17;
+  native[6]={x:mouth+7,y:-13}; native[7]={x:mouth+15,y:-5};
+  native[8]={x:mouth+15,y:5};  native[9]={x:mouth+7,y:13};
+  native[4]={x:2,y:-7}; native[11]={x:2,y:7};   /* hydrophobic pair tucked in the core */
+  /* DISPLAY (microscope/inspector): the same chain OPENED UP — wide ladder, every bond
+     a clear vertical line with space around it. Not the real shape; built to SHOW the bonds. */
+  const TOPX=[-150,-107,-64,-21,22,65,108,150];
+  for(let i=0;i<N;i++) display.push({x:0,y:0});
+  for(let i=0;i<8;i++)  display[i]={x:TOPX[i], y:-52+(i%2?4:-4)};
+  for(let i=8;i<16;i++) display[i]={x:TOPX[15-i], y:52+((15-i)%2?-4:4)};
+  display[6]={x:118,y:-46}; display[7]={x:168,y:-18};   /* hairpin turn = the active-site mouth */
+  display[8]={x:168,y:18};  display[9]={x:118,y:46};
+  /* UNFOLDED (denatured) */
+  for(let i=0;i<N;i++) unfolded.push({x:(i-N/2)*7.5, y:Math.sin(i*1.9)*10});
+  const types=["a","p","c","p","o","p","p","p","p","p","p","o","p","c","p","b"];
   const bonds=[
-    {i:2, j:15, type:"H"},
-    {i:5, j:11, type:"H"},
-    {i:6, j:9,  type:"H"},
-    {i:8, j:3,  type:"ionic"},
-    {i:10,j:14, type:"disulfide"}
+    {i:1, j:14, type:"H"},
+    {i:3, j:12, type:"H"},
+    {i:5, j:10, type:"H"},
+    {i:0, j:15, type:"ionic"},
+    {i:2, j:13, type:"disulfide"}
   ];
-  return {native, unfolded, types, bonds, phobic:[0,1,9,12], site:[4,5,6,7]};
+  return {native, display, unfolded, types, bonds, phobic:[4,11], site:[6,7,8,9]};
 }
-
 /* ================= particle classes ================= */
 let PID=1;
 const SUGAR_DEFS={
@@ -714,11 +748,13 @@ function drawInhib(ctx,p){
   ctx.restore();
 }
 function beadFill(t){ return t==="p"?COL.beadPhil : t==="o"?COL.beadPhob : t==="a"?COL.beadAcid : t==="b"?COL.beadBase : COL.beadCys; }
-function beadPositions(e, scale, time){
+function beadPositions(e, scale, time, exploded){
   const pts=[]; const jig=jiggleAmp()* (e.denatured?1.25:1);
   for(let i=0;i<16;i++){
-    const n=e.tpl.native[i], u=e.tpl.unfolded[i];
-    let bx=lerp(n.x,u.x,e.unfold), by=lerp(n.y,u.y,e.unfold);
+    const base=exploded? e.tpl.display[i] : e.tpl.native[i];
+    const u=e.tpl.unfolded[i];
+    const uu=exploded? {x:u.x*2.2, y:u.y*2.2} : u;
+    let bx=lerp(base.x,uu.x,e.unfold), by=lerp(base.y,uu.y,e.unfold);
     bx += Math.sin(time*9+i*2.3)*jig; by += Math.cos(time*8.2+i*1.7)*jig;
     pts.push({x:bx*scale, y:by*scale});
   }
@@ -726,17 +762,22 @@ function beadPositions(e, scale, time){
 }
 function drawEnzyme(ctx,e,opts){
   const o=opts||{}; const s=o.scale||1;
+  const beadR=(o.beadR||4.6);
   ctx.save();
   ctx.translate(o.x!==undefined?o.x:e.x, o.y!==undefined?o.y:e.y);
   if (!o.upright) ctx.rotate(e.rot);
-  const pts=beadPositions(e,s,S.t);
+  const pts=beadPositions(e,s,S.t,o.exploded);
   /* hydrophobic region shading */
   if (S.show.regions && !e.denatured && e.unfold<0.45){
     ctx.beginPath();
     const hp=e.tpl.phobic.map(i=>pts[i]);
     const cx=hp.reduce((a,p)=>a+p.x,0)/hp.length, cy=hp.reduce((a,p)=>a+p.y,0)/hp.length;
     ctx.fillStyle="rgba(214,185,140,.28)";
-    ctx.arc(cx,cy,17*s,0,TAU); ctx.fill();
+    ctx.arc(cx,cy,(o.exploded?20:17)*s,0,TAU); ctx.fill();
+    if (o.exploded && s>=1.2){ ctx.fillStyle="rgba(140,110,60,.85)"; ctx.font="8.5px sans-serif";
+      ctx.textAlign="center";
+      ctx.fillText("hydrophobic pair", cx/1, cy-4);
+      ctx.fillText("huddles from water", cx/1, cy+8); }
   }
   /* backbone */
   ctx.strokeStyle=outlineColor(e); ctx.lineWidth=2.4*s; ctx.lineJoin="round";
@@ -744,8 +785,17 @@ function drawEnzyme(ctx,e,opts){
   /* bonds */
   if (S.show.bonds){
     for(const b of e.bonds){
-      if (!b.intact) continue;
       const A=pts[b.i], B=pts[b.j];
+      if (!b.intact){
+        if (o.exploded){ /* snapped remnant: two short red stubs */
+          const dx=B.x-A.x, dy=B.y-A.y, L=Math.hypot(dx,dy)||1;
+          ctx.strokeStyle="rgba(154,42,22,.75)"; ctx.lineWidth=1.6*s; ctx.setLineDash([3*s,3*s]);
+          ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(A.x+dx/L*14*s, A.y+dy/L*14*s); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(B.x,B.y); ctx.lineTo(B.x-dx/L*14*s, B.y-dy/L*14*s); ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        continue;
+      }
       ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y);
       if (b.type==="H"){ ctx.setLineDash([3*s,3*s]); ctx.strokeStyle=COL.water; ctx.lineWidth=1.6*s; }
       else if (b.type==="ionic"){ ctx.setLineDash([1.5*s,3*s]); ctx.strokeStyle="#8A63B8"; ctx.lineWidth=2*s; }
@@ -769,14 +819,14 @@ function drawEnzyme(ctx,e,opts){
     const t=e.tpl.types[i];
     ctx.fillStyle=beadFill(t);
     ctx.strokeStyle="rgba(36,31,27,.35)"; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.arc(p.x,p.y,4.6*s,0,TAU); ctx.fill(); ctx.stroke();
-    if ((t==="a"||t==="b") && s>=1){
+    ctx.beginPath(); ctx.arc(p.x,p.y,beadR*s,0,TAU); ctx.fill(); ctx.stroke();
+    if ((t==="a"||t==="b") && (s>=1||o.exploded)){
       ctx.fillStyle="#fff"; ctx.font=`bold ${7*s}px sans-serif`; ctx.textAlign="center"; ctx.textBaseline="middle";
       const d=Math.abs(S.pH-7);
       const lost=(t==="a"&&S.pH<4.5)||(t==="b"&&S.pH>9.5);
       ctx.fillText(lost?"0":(t==="a"?"–":"+"),p.x,p.y+0.5);
     }
-    if (t==="c" && s>=1){ ctx.fillStyle="#6b5514"; ctx.font=`bold ${6.5*s}px sans-serif`;
+    if (t==="c" && (s>=1||o.exploded)){ ctx.fillStyle="#6b5514"; ctx.font=`bold ${6.5*s}px sans-serif`;
       ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("S",p.x,p.y+0.5); }
   });
   /* synthase growing chain */
@@ -796,9 +846,11 @@ function drawEnzyme(ctx,e,opts){
 function drawLab(){
   const {ctx,w,h}=fitCanvas(world());
   ctx.clearRect(0,0,w,h);
-  /* beaker walls */
-  ctx.fillStyle="#FBF8F2"; ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle=COL.rule; ctx.lineWidth=1.5; ctx.strokeRect(6,6,w-12,h-12);
+  /* beaker walls + liquid */
+  ctx.fillStyle="#F3EDDF"; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle="#F8F4EA"; ctx.fillRect(6,6,w-12,h-12);
+  ctx.strokeStyle="#CFC4B0"; ctx.lineWidth=2; ctx.strokeRect(6,6,w-12,h-12);
+  ctx.strokeStyle="rgba(255,255,255,.8)"; ctx.lineWidth=1; ctx.strokeRect(8,8,w-16,h-16);
   /* thermometer strip */
   const hot=clamp((S.T-37)/63,0,1);
   ctx.fillStyle=`rgba(154,42,22,${hot*0.10})`; ctx.fillRect(6,6,w-12,h-12);
@@ -814,6 +866,14 @@ function drawLab(){
     if (p.kind==="sugar" && p.held) drawSugar(ctx,p,1);
     if (p.kind==="inhib") drawInhib(ctx,p);
   }
+  /* live conditions chip */
+  ctx.fillStyle="rgba(36,31,27,.82)";
+  const chip=`${S.T} °C  ·  pH ${S.pH.toFixed(1)}`;
+  ctx.font="bold 11.5px sans-serif";
+  const cw2=ctx.measureText(chip).width+20;
+  ctx.fillRect(w-cw2-14, 14, cw2, 24);
+  ctx.fillStyle=S.T>45?"#F0A48E":(Math.abs(S.pH-7)>2.5?"#F0A48E":"#E0B36A");
+  ctx.textAlign="left"; ctx.fillText(chip, w-cw2-4, 30);
   /* water FX */
   if (S.show.water) for(const fx of S.effects){
     const k=fx.t/fx.dur;
@@ -858,12 +918,14 @@ function drawScope(){
     return;
   }
   stEl.style.display="block";
-  drawEnzyme(ctx,e,{x:w/2,y:h/2-8,scale:2.55,upright:true,noName:true,labelBonds:!e.denatured&&e.unfold<0.3});
+  drawEnzyme(ctx,e,{x:w/2,y:h/2-4,scale:0.78,upright:true,noName:true,exploded:true,beadR:9,labelBonds:true});
   /* active-site tag */
   if (!e.denatured && e.unfold<0.34){
-    ctx.fillStyle=COL.vir; ctx.font="bold 10px sans-serif"; ctx.textAlign="left";
-    ctx.fillText("active site", w/2+52, h/2-8);
+    ctx.fillStyle=COL.vir; ctx.font="bold 10px sans-serif"; ctx.textAlign="right";
+    ctx.fillText("active site →", w-6, h/2-2);
   }
+  ctx.fillStyle=COL.mut; ctx.font="italic 9.5px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("opened-up view — in the beaker this chain is folded compact", w/2, h-8);
   nameEl.textContent = enzymeLabel(e) + (e.uses ? ` · ${e.uses} reaction${e.uses>1?"s":""} catalysed` : "");
   const rows = e.bonds.map((b,bi)=>{
     const chipCol=b.type==="H"?COL.water:(b.type==="ionic"?"#8A63B8":"#B08A1E");
@@ -1217,11 +1279,11 @@ function drawBuild(){
   if (b.anim){ drawCloseup(ctx,w,h,b); return; }
   /* chain layout — scaled up while the chain is short */
   const n=b.chain.length;
-  const step=58;
+  const step=72;
   const totalW=(n-1)*step;
   const x0=w/2-totalW/2 - (b.anim?26:0);
   const yMid=h/2-14;
-  const kz=clamp((w-80)/((n+2.6)*step),1,1.5);
+  const kz=clamp((w-100)/((n+2.2)*step),1,1.85);
   ctx.save(); ctx.translate(w/2,yMid); ctx.scale(kz,kz); ctx.translate(-w/2,-yMid);
   ctx.fillStyle=COL.mut; ctx.font="italic 12px sans-serif"; ctx.textAlign="left";
   ctx.fillText("amine terminal", x0-86, yMid-64);
@@ -1231,14 +1293,20 @@ function drawBuild(){
     const x=x0+i*step, y=yMid+Math.sin(i*1.05)*10;
     drawResidue(ctx,x,y,code,i%2===1, null, {showNH:i===0, showOH:i===n-1&&!b.complete});
     if (i<n-1){
-      /* peptide bond marker between C of i and N of i+1 */
-      const bx=x+22+ (step-44)/2, by=(y+yMid+Math.sin((i+1)*1.05)*10)/2;
-      ctx.fillStyle=COL.vir; ctx.font="bold 8.5px sans-serif"; ctx.textAlign="center";
-      if (S.show.labels) ctx.fillText("peptide bond", bx, by-16);
-      ctx.strokeStyle=COL.vir; ctx.lineWidth=2.4;
+      ctx.strokeStyle=COL.vir; ctx.lineWidth=3.2;
       ctx.beginPath(); ctx.moveTo(x+30,y); ctx.lineTo(x0+(i+1)*step-30, yMid+Math.sin((i+1)*1.05)*10); ctx.stroke();
     }
   });
+  /* one clean peptide-bonds label with a leader line to the middle link */
+  if (S.show.labels && n>1){
+    const mi=Math.floor((n-1)/2);
+    const bx=x0+mi*step+step/2, by=(yMid+Math.sin(mi*1.05)*10+yMid+Math.sin((mi+1)*1.05)*10)/2;
+    const lx=bx-20, ly=yMid-78;
+    ctx.strokeStyle=COL.vir; ctx.lineWidth=1.2; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(lx,ly+8); ctx.lineTo(bx,by-4); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=COL.vir; ctx.font="bold 12px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("peptide bonds (green)", lx, ly);
+  }
   const endX=x0+(n-1)*step, endY=yMid+Math.sin((n-1)*1.05)*10;
   ctx.fillStyle=COL.mut; ctx.font="italic 12px sans-serif"; ctx.textAlign="left";
   ctx.fillText(b.complete ? "carboxyl terminal" : "carboxyl terminal — drag the next amino acid HERE", endX+34, endY-46);
@@ -1291,7 +1359,10 @@ function drawHaworth(ctx,cx,cy,sc,o){
     ctx.fillStyle=COL.ink; ctx.beginPath(); ctx.arc(pts[i].x,pts[i].y,2.6*sc,0,TAU); ctx.fill();
     if (o.nums!==false){
       ctx.fillStyle=COL.mut; ctx.font=`${8*sc}px sans-serif`;
-      const off=(i===0)?{x:10*sc,y:-8*sc*f}:(i===3?{x:-11*sc,y:-8*sc*f}:{x:0,y:(i===1||i===2? 13*sc*f : -13*sc*f)});
+      const off=(i===0)?{x:11*sc,y:-6*sc*f}
+        :(i===3?{x:-11*sc,y:14*sc*f}
+        :(i===4?{x:-13*sc,y:2*sc}
+        :{x:0,y:13*sc*f}));
       ctx.fillText(i+1, pts[i].x+off.x, pts[i].y+off.y);
     }
   }
@@ -1336,7 +1407,7 @@ function glycoBridge(ctx,A,B,label,sc,yLift){
   return {x:mx,y:my};
 }
 /* ================= molecule inspector ================= */
-function openInspector(p){ S.inspect={p, view:"simple"}; }
+function openInspector(p){ if(!p) return; S.inspect={p, view:S.inspect?S.inspect.view:"simple"}; }
 function inspectorTitle(p){
   if (p.kind==="enzyme") return enzymeLabel(p);
   if (p.kind==="inhib") return "competitive inhibitor";
@@ -1351,14 +1422,16 @@ const SUGAR_FACTS={
   cellulose:["β-glucose chain · β-1,4 bonds · every second unit inverted → straight fibres","digested here by: NOTHING — no enzyme in this beaker (or in you) cuts β-1,4"]
 };
 function drawInspector(ctx,w,h){
-  const I=S.inspect; if(!I) return;
+  const I=S.inspect; if(!I||!I.p){ S.inspect=null; return; }
   const p=I.p;
   if (p.kind && !S.particles.includes(p)){ S.inspect=null; return; }
   const X=34,Y=20,W2=w-68,H2=h-40;
   ctx.save();
-  ctx.fillStyle="rgba(36,31,27,.35)"; ctx.fillRect(0,0,w,h);
-  ctx.fillStyle="#FFFFFF"; ctx.strokeStyle=COL.rule; ctx.lineWidth=1.5;
-  ctx.fillRect(X,Y,W2,H2); ctx.strokeRect(X,Y,W2,H2);
+  ctx.fillStyle="rgba(244,239,231,.82)"; ctx.fillRect(0,0,w,h);
+  ctx.shadowColor="rgba(36,31,27,.22)"; ctx.shadowBlur=18; ctx.shadowOffsetY=4;
+  ctx.fillStyle="#FFFFFF"; ctx.fillRect(X,Y,W2,H2);
+  ctx.shadowColor="transparent"; ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+  ctx.strokeStyle=COL.vir; ctx.lineWidth=2; ctx.strokeRect(X,Y,W2,H2);
   S._ihits=[];
   /* header */
   ctx.fillStyle=COL.ink; ctx.font="bold 17px Georgia,serif"; ctx.textAlign="left";
@@ -1390,19 +1463,19 @@ function drawInspector(ctx,w,h){
       drawSugar(ctx,fake,2.3);
       const facts=SUGAR_FACTS[p.stype]||[];
       ctx.fillStyle=COL.ink; ctx.font="12.5px sans-serif"; ctx.textAlign="center";
-      facts.forEach((f2,i)=>ctx.fillText(f2, cx, Y+H2-64+i*18));
-      if (p.limit){ ctx.fillStyle=COL.amber; ctx.fillText("this one is a LIMIT DEXTRIN — amylase stopped at its α-1,6 branch points", cx, Y+H2-28); }
+      facts.forEach((f2,i)=>ctx.fillText(f2, cx, Y+H2-80+i*17));
+      if (p.limit){ ctx.fillStyle=COL.amber; ctx.fillText("this one is a LIMIT DEXTRIN — amylase stopped at its α-1,6 branch points", cx, Y+H2-46); }
     } else {
       drawSugarChem(ctx,X,Y+40,W2,H2-70,p);
     }
   } else if (p.kind==="enzyme"){
     if (I.view==="simple"){
-      drawEnzyme(ctx,p,{x:cx,y:cy-10,scale:3.1,upright:true,noName:true,labelBonds:!p.denatured&&p.unfold<0.3});
+      drawEnzyme(ctx,p,{x:cx,y:cy-12,scale:1.55,upright:true,noName:true,exploded:true,beadR:8,labelBonds:true});
       ctx.fillStyle=COL.mut; ctx.font="11.5px sans-serif"; ctx.textAlign="center";
-      ctx.fillText("bead colours: teal hydrophilic · tan hydrophobic (core) · red acidic (–) · blue basic (+) · gold cysteine (S)", cx, Y+H2-64);
-      ctx.fillText("numbered chips match the bond list in the side panel · the notch is the active site", cx, Y+H2-46);
+      ctx.fillText("the chain OPENED UP so every bond is visible — each numbered line joins the two amino acids it holds together", cx, Y+H2-80);
+      ctx.fillText("teal hydrophilic · tan hydrophobic · red acidic (–) · blue basic (+) · gold cysteine (S) · the right-hand turn is the active site", cx, Y+H2-63);
       ctx.fillStyle=p.denatured?COL.ox:COL.vir; ctx.font="bold 12px sans-serif";
-      ctx.fillText(p.denatured?"DENATURED — shape and active site lost":"NATIVE — fold intact", cx, Y+H2-26);
+      ctx.fillText(p.denatured?"DENATURED — shape and active site lost":"NATIVE — fold intact", cx, Y+H2-46);
     } else {
       drawEnzymeChem(ctx,X,Y+40,W2,H2-70,p);
     }
@@ -1412,15 +1485,40 @@ function drawInspector(ctx,w,h){
     ctx.fillText("blocking it without being changed. Its exact structure varies; the SHAPE is the point (C1.1, HL).", cx, cy+10);
     drawInhib(ctx,{x:cx,y:cy+60,rot:0});
   }
+  /* molecule switcher strip: every distinct thing currently in the beaker */
+  const present=[];
+  const seen=new Set();
+  for(const q of S.particles){
+    const key=q.kind==="sugar"?("s:"+q.stype):(q.kind==="enzyme"?("e:"+q.etype):"i:inhib");
+    if (seen.has(key)) continue; seen.add(key);
+    present.push({key, label:q.kind==="sugar"?q.stype:(q.kind==="enzyme"?enzymeLabel(q):"inhibitor"), q});
+  }
+  present.sort((a,b)=>a.key.localeCompare(b.key));
+  ctx.font="600 10.5px sans-serif";
+  let totW=0; const pads=14, gap=6;
+  for(const it of present) it.w=ctx.measureText(it.label).width+pads;
+  totW=present.reduce((a,it)=>a+it.w,0)+gap*(present.length-1);
+  let px2=cx-totW/2;
+  const stripY=Y+H2-34;
+  for(const it of present){
+    const active=(p.kind==="sugar"&&it.key==="s:"+p.stype)||(p.kind==="enzyme"&&it.key==="e:"+p.etype)||(p.kind==="inhib"&&it.key==="i:inhib");
+    ctx.fillStyle=active?COL.vir:"#FFFFFF"; ctx.strokeStyle=active?COL.vir:COL.rule; ctx.lineWidth=1.2;
+    ctx.fillRect(px2,stripY,it.w,20); ctx.strokeRect(px2,stripY,it.w,20);
+    ctx.fillStyle=active?"#fff":COL.ink; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText(it.label, px2+it.w/2, stripY+10.5);
+    S._ihits.push({x:px2,y:stripY,w:it.w,h:20,act:"pick:"+it.key});
+    px2+=it.w+gap;
+  }
+  ctx.textBaseline="alphabetic";
   /* footer disclaimer */
   ctx.fillStyle=COL.mut; ctx.font="italic 10.5px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("Simplified teaching model — not the molecule’s real shape or full structure. Bond types and linkage geometry are accurate.", cx, Y+H2-8);
+  ctx.fillText("Simplified teaching model — not the molecule’s real shape or full structure. Bond types and linkage geometry are accurate.", cx, Y+H2-6);
   ctx.restore();
 }
 function drawSugarChem(ctx,X,Y,W2,H2,p){
   const cx=X+W2/2, cy=Y+H2/2-6;
   const cap=(lines,col)=>{ ctx.textAlign="center"; ctx.font="12px sans-serif";
-    lines.forEach((l,i)=>{ ctx.fillStyle=(col&&col[i])||COL.ink; ctx.fillText(l, cx, Y+H2-40+i*17); }); };
+    lines.forEach((l,i)=>{ ctx.fillStyle=(col&&col[i])||COL.ink; ctx.fillText(l, cx, Y+H2-58+i*16); }); };
   const st=p.stype;
   if (st==="glucose"){
     drawHaworth(ctx,cx,cy,1.6,{hiC1:true});
@@ -1675,10 +1773,10 @@ function drawBondEx(ctx,w,h){
       /* branch task: incoming ring above, joins mid ring's C6 */
       ctx.strokeStyle=COL.ink; ctx.lineWidth=1.5;
       ctx.fillStyle=COL.mut; ctx.font="10.5px sans-serif"; ctx.textAlign="center";
-      ctx.fillText("OH", mid.C6.x+12, mid.C6.y-2);
+      ctx.fillText("OH", mid.C6.x+16, mid.C6.y-6);
       const inc=drawHaworth(ctx, mid.C6.x-40, cy-150, 1.2, {hideC1OH:false, hiC1:true, nums:true});
       reg({x:inc.C1.x+2,y:inc.C1.y+24},"L",true,null);
-      reg({x:mid.C6.x+12,y:mid.C6.y-4},"R",true,null);
+      reg({x:mid.C6.x+16,y:mid.C6.y-8},"R",true,null);
       reg(mid?{x:prev.C1.x,y:prev.C1.y+18}:null,"d1",false,"the chain’s carbon-1 end grows the α-1,4 chain — a BRANCH attaches at carbon 6");
       reg(inc.Oring,"d2",false,"the ring oxygen stays inside the ring");
       reg(inc.C6,"d3",false,"that is the incoming glucose’s carbon 6 — the bond forms from its carbon 1");
@@ -1687,9 +1785,9 @@ function drawBondEx(ctx,w,h){
       const inc=drawHaworth(ctx, baseX+doneRings*ringGap+40, cy, scl, {beta, flip:beta&&doneRings%2===1, hiC1:!beta||st.flipped||doneRings%2!==1?true:true, nums:true, showC4OH:false});
       /* incoming gives its C1–OH; the chain end’s C4–OH gives the H — wait: chain grows at C4 of incoming? Convention: chain C1 + incoming C4. Keep consistent with maltose text: left C1-OH + right C4-H. Incoming is RIGHT: its C4 receives. */
       ctx.fillStyle=COL.mut; ctx.font="11px sans-serif"; ctx.textAlign="center";
-      ctx.fillText("HO", inc.C4.x-16, inc.C4.y+4);
+      ctx.fillText("HO", inc.C4.x-24, inc.C4.y+4);
       reg({x:prev.C1.x+3,y:prev.C1.y+(beta&&(doneRings-1)%2===1?-24:24)},"L",true,null);
-      reg({x:inc.C4.x-16,y:inc.C4.y},"R",true,null);
+      reg({x:inc.C4.x-24,y:inc.C4.y},"R",true,null);
       reg(inc.Oring,"d1",false,"the ring oxygen stays inside the ring — it never leaves");
       reg(inc.C6,"d2",false, st.ex==="cellulose"?"carbon 6 is not where β-1,4 forms":"carbon 6 is for α-1,6 BRANCHES — this bond is 1,4");
       reg({x:inc.C1.x+2,y:inc.C1.y+(beta&&doneRings%2===1?-24:24)},"d3",false,"that OH sits on the incoming glucose’s carbon 1 — here the chain’s carbon 1 bonds to the newcomer’s carbon 4");
@@ -2054,6 +2152,15 @@ window.addEventListener("load",()=>{
       for(const ht of (S._ihits||[])){
         if (x>=ht.x&&x<=ht.x+ht.w&&y>=ht.y&&y<=ht.y+ht.h){
           if (ht.act==="close") S.inspect=null;
+          else if (ht.act.startsWith("pick:")){
+            const key=ht.act.slice(5);
+            const found=S.particles.find(q=>{
+              if (key.startsWith("s:")) return q.kind==="sugar"&&q.stype===key.slice(2);
+              if (key.startsWith("e:")) return q.kind==="enzyme"&&q.etype===key.slice(2);
+              return q.kind==="inhib";
+            });
+            if (found){ S.inspect.p=found; if (found.kind==="enzyme") S.scopeTarget=found; }
+          }
           else S.inspect.view=ht.act;
           acted=true; break;
         }
@@ -2068,6 +2175,11 @@ window.addEventListener("load",()=>{
       if (best.kind==="enzyme") S.scopeTarget=best;
       openInspector(best);
     }
+  });
+  document.getElementById("btnGraphMin").addEventListener("click",e=>{
+    const f=document.getElementById("graphWrap");
+    f.classList.toggle("min");
+    e.target.textContent=f.classList.contains("min")?"▸ expand":"▾ minimize";
   });
   document.getElementById("btnInspect").addEventListener("click",()=>{
     if (S.mode==="lab" && S.scopeTarget) openInspector(S.scopeTarget);
