@@ -779,7 +779,7 @@ function drawScope(){
     const state=b.intact?`<span class="state ok">intact</span>`:`<span class="state bad">${b.permanent?"broken":"broken*"}</span>`;
     return `<li>${sym}${label}${state}</li>`;
   });
-  rows.push(`<li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="rgba(214,185,140,.5)"/></svg>hydrophobic huddle<span class="state ${e.unfold<0.4?'ok':'bad'}">${e.unfold<0.4?"clustered":"exposed"}</span></li>`);
+  rows.push(`<li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="rgba(214,185,140,.5)"/></svg>hydrophobic core (inside)<span class="state ${e.unfold<0.4?'ok':'bad'}">${e.unfold<0.4?"tucked in":"exposed"}</span></li>`);
   list.innerHTML=rows.join("");
   const brokenW=e.bonds.filter(b=>b.type!=="disulfide"&&!b.intact).length;
   if (e.denatured){ stEl.className="status denatured"; stEl.textContent="DENATURED — 3-D shape lost, active site gone"; }
