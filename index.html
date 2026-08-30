@@ -152,6 +152,10 @@
   .glegend .foot{color:var(--mut);font-size:10px;margin-top:6px;line-height:1.35}
   .bondlist .numchip{width:16px;height:16px;flex:0 0 16px;border-radius:50%;color:#fff;
     font:700 10px/16px sans-serif;text-align:center}
+  .scrollcue{position:sticky; bottom:4px; align-self:center; background:var(--ink); color:#F4EFE7;
+    font:600 10px/1 sans-serif; letter-spacing:.06em; padding:5px 10px; border-radius:10px;
+    opacity:.85; pointer-events:none; flex:0 0 auto}
+  .scrollcue.gone{display:none}
   .modal{position:fixed; inset:0; background:rgba(36,31,27,.55); display:none; align-items:center; justify-content:center; z-index:50}
   .modal.open{display:flex}
   .modal .box{background:var(--panel); max-width:640px; width:92%; max-height:84vh; overflow-y:auto; border-radius:6px; padding:22px 26px}
@@ -235,6 +239,7 @@
       <h3>What is happening</h3>
       <div class="body"><div class="narration" id="narration"></div></div>
     </div>
+    <div class="scrollcue" id="cueL">▼ SCROLL — MORE BELOW</div>
   </aside>
 
   <section class="center">
@@ -253,7 +258,7 @@
       <h3>Under the microscope</h3>
       <canvas id="scopeCanvas"></canvas>
       <div class="disclaim">Simplified model — <b>not</b> the molecule’s real shape (real enzymes are hundreds of amino acids). The bond types and their behaviour are the real science.</div>
-      <button class="tbtn scopebtn" id="btnInspect">🔍 Open large inspector</button>
+      <button class="tbtn scopebtn" id="btnInspect">⤢ Open up the molecule</button>
       <div class="body">
         <div id="scopeName" style="font-weight:700"></div>
         <ul class="bondlist" id="bondList"></ul>
@@ -264,6 +269,7 @@
       <h3>Key</h3>
       <div class="body"><ul class="bondlist" id="keyList"></ul></div>
     </div>
+    <div class="scrollcue" id="cueR">▼ SCROLL — MORE BELOW</div>
   </aside>
 </main>
 
@@ -959,15 +965,15 @@ function drawScope(){
     return;
   }
   stEl.style.display="block";
-  const msc=Math.max(0.5, Math.min(0.8, (h-46)/175, (w-24)/400));
-  drawEnzyme(ctx,e,{x:w/2,y:h/2-4,scale:msc,upright:true,noName:true,exploded:true,beadR:9,labelBonds:true});
+  const msc=Math.max(1.4, Math.min(2.6, (h-52)/52, (w-40)/92));
+  drawEnzyme(ctx,e,{x:w/2-6,y:h/2-6,scale:msc,upright:true,noName:true,labelBonds:!e.denatured&&e.unfold<0.3});
   /* active-site tag */
   if (!e.denatured && e.unfold<0.34){
     ctx.fillStyle=COL.vir; ctx.font="bold 10px sans-serif"; ctx.textAlign="right";
-    ctx.fillText("active site →", w-6, h/2-2);
+    ctx.fillText("active site →", w-8, h/2-6);
   }
   ctx.fillStyle=COL.mut; ctx.font="italic 9.5px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("opened-up view — in the beaker this chain is folded compact", w/2, h-8);
+  ctx.fillText("the real fold is a tangle — “Open up the molecule” to see every bond", w/2, h-8);
   nameEl.textContent = enzymeLabel(e) + (e.uses ? ` · ${e.uses} reaction${e.uses>1?"s":""} catalysed` : "");
   const rows = e.bonds.map((b,bi)=>{
     const chipCol=b.type==="H"?COL.water:(b.type==="ionic"?"#8A63B8":"#B08A1E");
@@ -1539,13 +1545,38 @@ function drawInspector(ctx,w,h){
     }
   } else if (p.kind==="enzyme"){
     if (I.view==="simple"){
-      const bodyTop=Y+78, capH=64;
+      const bodyTop=Y+78, capH=52;
       const bodyH=(H2-104)-capH;
-      const esc=Math.max(0.55, Math.min(1.6, bodyH/175, (W2-70)/400));
-      drawEnzyme(ctx,p,{x:cx,y:bodyTop+bodyH/2,scale:esc,upright:true,noName:true,exploded:true,beadR:Math.max(6,8*Math.min(esc/1.2,1)),labelBonds:true});
+      const esc=Math.max(0.55, Math.min(1.6, bodyH/175, (W2-230)/400));
+      const foldCx=cx-72;
+      drawEnzyme(ctx,p,{x:foldCx,y:bodyTop+bodyH/2,scale:esc,upright:true,noName:true,exploded:true,beadR:Math.max(6,8*Math.min(esc/1.2,1)),labelBonds:true});
+      /* colour-coded legend, right side */
+      {
+        const lx=X+W2-176, ly0=bodyTop+6;
+        const items=[[COL.beadPhil,"hydrophilic"],[COL.beadPhob,"hydrophobic"],[COL.beadAcid,"acidic R-group ( – )"],[COL.beadBase,"basic R-group ( + )"],[COL.beadCys,"cysteine (S)"]];
+        ctx.textAlign="left"; ctx.font="11px sans-serif";
+        ctx.fillStyle=COL.mut; ctx.font="bold 9.5px sans-serif";
+        ctx.fillText("AMINO ACID KEY", lx, ly0);
+        items.forEach(([col,lab],i)=>{
+          const yy=ly0+16+i*20;
+          ctx.fillStyle=col; ctx.beginPath(); ctx.arc(lx+6,yy-3,5.5,0,TAU); ctx.fill();
+          ctx.strokeStyle="rgba(36,31,27,.35)"; ctx.lineWidth=1; ctx.stroke();
+          ctx.fillStyle=COL.ink; ctx.font="11px sans-serif"; ctx.fillText(lab, lx+18, yy);
+        });
+        const bl=[["#4C8FD6","hydrogen bond","dash"],["#8A63B8","ionic bond","dot"],["#B08A1E","disulfide (covalent)","solid"]];
+        ctx.fillStyle=COL.mut; ctx.font="bold 9.5px sans-serif";
+        ctx.fillText("BOND KEY", lx, ly0+124);
+        bl.forEach(([col,lab,style],i)=>{
+          const yy=ly0+140+i*20;
+          ctx.strokeStyle=col; ctx.lineWidth=style==="solid"?3:2;
+          ctx.setLineDash(style==="dash"?[4,3]:(style==="dot"?[2,4]:[]));
+          ctx.beginPath(); ctx.moveTo(lx,yy-4); ctx.lineTo(lx+13,yy-4); ctx.stroke(); ctx.setLineDash([]);
+          ctx.fillStyle=COL.ink; ctx.font="11px sans-serif"; ctx.fillText(lab, lx+18, yy);
+        });
+      }
       if (!p.denatured && p.unfold<0.34){
         const sb=p.tpl.site.map(i=>p.tpl.display[i]);
-        const sx0=sb.reduce((a,q)=>a+q.x,0)/sb.length*esc+cx;
+        const sx0=sb.reduce((a,q)=>a+q.x,0)/sb.length*esc+foldCx;
         const sy0=sb.reduce((a,q)=>a+q.y,0)/sb.length*esc+bodyTop+bodyH/2;
         const srad=(Math.max(...sb.map(q=>Math.hypot(q.x-sb.reduce((a,r2)=>a+r2.x,0)/4, q.y-sb.reduce((a,r2)=>a+r2.y,0)/4)))+16)*esc;
         ctx.strokeStyle=COL.amber; ctx.setLineDash([5,4]); ctx.lineWidth=1.8;
@@ -1554,8 +1585,7 @@ function drawInspector(ctx,w,h){
         ctx.fillText("active site", sx0+srad+6, sy0+4);
       }
       ctx.fillStyle=COL.mut; ctx.font="11px sans-serif"; ctx.textAlign="center";
-      ctx.fillText("the chain OPENED UP so every bond is visible — each numbered line joins the two amino acids it holds together", cx, Y+H2-62);
-      ctx.fillText("teal hydrophilic · tan hydrophobic · red acidic (–) · blue basic (+) · gold cysteine (S) · the pocket is the active site", cx, Y+H2-46);
+      ctx.fillText("the chain OPENED UP so every bond is visible — each numbered line joins the two amino acids it holds together (in the beaker it is folded into a tangle)", cx, Y+H2-46);
       ctx.fillStyle=p.denatured?COL.ox:COL.vir; ctx.font="bold 12px sans-serif";
       ctx.fillText(p.denatured?"DENATURED — shape and active site lost":"NATIVE — fold intact", cx, Y+H2-28);
     } else {
@@ -2087,7 +2117,7 @@ function setMode(mode){
   document.getElementById("buildTray").style.display=lab?"none":"";
   document.getElementById("wordEq").style.display=lab?"none":"";
   document.getElementById("stageHint").textContent = lab
-    ? "Click ANY molecule or enzyme to open the large inspector (Simple / Chemical views) · shapes are simplified — see “What is real?”"
+    ? "Click ANY molecule or enzyme to OPEN IT UP (Simple / Chemical views) · shapes are simplified — see “What is real?”"
     : (S._exHint || "Drag an amino acid from the tray to the chain's carboxyl end — the gene decides the order.");
   document.getElementById("stageHint").style.visibility="visible";
   document.querySelector("aside.right").style.display = "";
@@ -2252,6 +2282,16 @@ window.addEventListener("load",()=>{
       openInspector(best);
     }
   });
+  const cueCheck=()=>{
+    [["cueL","aside.left"],["cueR","aside.right"]].forEach(([id,sel])=>{
+      const a=document.querySelector(sel), c=document.getElementById(id);
+      if (!a||!c) return;
+      c.classList.toggle("gone", a.scrollHeight - a.clientHeight - a.scrollTop < 28);
+    });
+  };
+  document.querySelectorAll("aside.left, aside.right").forEach(a=>a.addEventListener("scroll",cueCheck));
+  window.addEventListener("resize",cueCheck);
+  setInterval(cueCheck, 800);
   document.getElementById("btnGraphMin").addEventListener("click",e=>{
     const f=document.getElementById("graphWrap");
     f.classList.toggle("min");
