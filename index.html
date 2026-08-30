@@ -61,12 +61,12 @@
     border-radius:5px 5px 0 0; display:flex; align-items:center; gap:7px}
   .card h3::before{content:""; width:8px; height:8px; background:var(--vir); border-radius:2px; flex:0 0 8px}
   .card .body{padding:10px 12px}
-  aside.left{display:flex; flex-direction:column; gap:12px; overflow-y:auto;
-    scrollbar-width:thin; scrollbar-color:var(--rule) transparent; padding:2px 4px 26px 2px}
-  aside.left::-webkit-scrollbar, aside.right::-webkit-scrollbar{width:9px}
-  aside.left::-webkit-scrollbar-thumb, aside.right::-webkit-scrollbar-thumb{
-    background:var(--rule); border-radius:5px; border:2px solid var(--oat)}
-  aside.left::-webkit-scrollbar-track, aside.right::-webkit-scrollbar-track{background:transparent}
+  aside.left{display:flex; flex-direction:column; gap:6px; overflow:hidden; min-height:0}
+  .panelscroll{flex:1; min-height:0; overflow-y:auto; display:flex; flex-direction:column; gap:12px;
+    scrollbar-width:thin; scrollbar-color:var(--rule) transparent; padding:2px 4px 8px 2px}
+  .panelscroll::-webkit-scrollbar{width:9px}
+  .panelscroll::-webkit-scrollbar-thumb{background:var(--rule); border-radius:5px; border:2px solid var(--oat)}
+  .panelscroll::-webkit-scrollbar-track{background:transparent}
   .sliderrow{margin:6px 0 12px}
   .sliderrow label{display:flex; justify-content:space-between; font-weight:600; font-size:13px}
   .sliderrow label output{font-weight:700; color:var(--vir); font-variant-numeric:tabular-nums}
@@ -90,8 +90,7 @@
   .stage canvas{position:absolute; inset:0; width:100%; height:100%}
   canvas{display:block; width:100%; height:100%}
   .stage .hint{position:absolute; left:12px; bottom:10px; color:var(--mut); font-size:11px; font-style:italic; pointer-events:none}
-  aside.right{display:flex; flex-direction:column; gap:12px; overflow-y:auto;
-    scrollbar-width:thin; scrollbar-color:var(--rule) transparent; padding:2px 2px 26px 4px}
+  aside.right{display:flex; flex-direction:column; gap:6px; overflow:hidden; min-height:0}
   #scopeCanvas{width:100%; height:250px}
   .bondlist{list-style:none; font-size:12px}
   .bondlist li{display:flex; align-items:center; gap:8px; padding:4px 0; border-bottom:1px dashed var(--rule)}
@@ -152,9 +151,9 @@
   .glegend .foot{color:var(--mut);font-size:10px;margin-top:6px;line-height:1.35}
   .bondlist .numchip{width:16px;height:16px;flex:0 0 16px;border-radius:50%;color:#fff;
     font:700 10px/16px sans-serif;text-align:center}
-  .scrollcue{position:sticky; bottom:4px; align-self:center; background:var(--ink); color:#F4EFE7;
-    font:600 10px/1 sans-serif; letter-spacing:.06em; padding:5px 10px; border-radius:10px;
-    opacity:.85; pointer-events:none; flex:0 0 auto}
+  .scrollcue{flex:0 0 auto; text-align:center; background:var(--oat2); color:var(--mut);
+    font:600 10px/1 sans-serif; letter-spacing:.08em; padding:6px 10px; border-radius:4px;
+    border:1px solid var(--rule); pointer-events:none}
   .scrollcue.gone{display:none}
   .modal{position:fixed; inset:0; background:rgba(36,31,27,.55); display:none; align-items:center; justify-content:center; z-index:50}
   .modal.open{display:flex}
@@ -197,6 +196,7 @@
 
 <main>
   <aside class="left">
+   <div class="panelscroll">
     <!-- LAB CONTROLS -->
     <div class="card" id="envCard">
       <h3>Conditions</h3>
@@ -239,7 +239,8 @@
       <h3>What is happening</h3>
       <div class="body"><div class="narration" id="narration"></div></div>
     </div>
-    <div class="scrollcue" id="cueL">▼ SCROLL — MORE BELOW</div>
+   </div>
+   <div class="scrollcue" id="cueL">▼ SCROLL — MORE BELOW</div>
   </aside>
 
   <section class="center">
@@ -254,6 +255,7 @@
   </section>
 
   <aside class="right">
+   <div class="panelscroll">
     <div class="card">
       <h3>Under the microscope</h3>
       <canvas id="scopeCanvas"></canvas>
@@ -269,7 +271,8 @@
       <h3>Key</h3>
       <div class="body"><ul class="bondlist" id="keyList"></ul></div>
     </div>
-    <div class="scrollcue" id="cueR">▼ SCROLL — MORE BELOW</div>
+   </div>
+   <div class="scrollcue" id="cueR">▼ SCROLL — MORE BELOW</div>
   </aside>
 </main>
 
@@ -1035,14 +1038,15 @@ function sampleChart(){
 }
 function drawChart(){
   const {ctx,w,h}=fitCanvas(document.getElementById("chartCanvas"));
+  const hcv=h;
   ctx.clearRect(0,0,w,h);
-  const padL=34,padR=54,padT=12,padB=22;
+  const padL=46,padR=54,padT=18,padB=24;
   const data=S.chart.data;
   const win=90;
   const t1=Math.max(S.t,win), t0=t1-win;
   const view=data.filter(d=>d.t>=t0-1);
   let maxY=5; for(const d of view) maxY=Math.max(maxY,d.st,d.gy||0,d.ma,d.gl);
-  maxY=Math.ceil(maxY/5)*5;
+  maxY=Math.max(5, Math.ceil((maxY*1.18)/5)*5);
   const X=t=>padL+(t-t0)/(t1-t0)*(w-padL-padR);
   const Y=v=>h-padB-(v/maxY)*(h-padT-padB);
   /* grid */
@@ -1054,7 +1058,10 @@ function drawChart(){
   for(let t=Math.ceil(t0/15)*15; t<=t1; t+=15){
     ctx.textAlign="center"; ctx.fillText(t+"s", X(t), h-7);
   }
-  ctx.fillStyle=COL.mut; ctx.textAlign="left"; ctx.fillText("molecules", padL, 10);
+  ctx.save();
+  ctx.translate(12,(padT+hcv-padB)/2); ctx.rotate(-Math.PI/2);
+  ctx.fillStyle=COL.mut; ctx.textAlign="center"; ctx.fillText("molecules",0,0);
+  ctx.restore();
   /* series */
   drawChart._placed=[];
   const series=[["st",COL.starch,"starch"],["gy",COL.sGlycogen,"glycogen"],["ma",COL.maltose,"maltose"],["gl",COL.glucose,"glucose"]];
@@ -1563,7 +1570,7 @@ function drawInspector(ctx,w,h){
       const bodyTop=Y+78, capH=52;
       const bodyH=(H2-104)-capH;
       const xs=p.tpl.display.map(q=>q.x), ys=p.tpl.display.map(q=>q.y);
-      const spanX=Math.max(...xs)-Math.min(...xs)+90, spanY=Math.max(...ys)-Math.min(...ys)+70;
+      const spanX=Math.max(...xs)-Math.min(...xs)+170, spanY=Math.max(...ys)-Math.min(...ys)+150;
       const esc=Math.max(0.5, Math.min(1.6, bodyH/spanY, (W2-230)/spanX));
       const foldCx=cx-72;
       drawEnzyme(ctx,p,{x:foldCx,y:bodyTop+bodyH/2,scale:esc,upright:true,noName:true,exploded:true,beadR:Math.max(6,8*Math.min(esc/1.2,1)),labelBonds:true});
@@ -1599,7 +1606,7 @@ function drawInspector(ctx,w,h){
         ctx.strokeStyle=COL.amber; ctx.setLineDash([5,4]); ctx.lineWidth=1.8;
         ctx.beginPath(); ctx.arc(sx0,sy0,srad,0,TAU); ctx.stroke(); ctx.setLineDash([]);
         ctx.fillStyle=COL.amber; ctx.font="bold 11px sans-serif"; ctx.textAlign="left";
-        ctx.fillText("active site", sx0+srad+6, sy0+4);
+        ctx.fillText("active site", Math.min(sx0+srad+6, X+W2-92), clamp(sy0+4, bodyTop+12, Y+H2-70));
       }
       ctx.fillStyle=COL.mut; ctx.font="11px sans-serif"; ctx.textAlign="center";
       ctx.fillText("the chain OPENED UP so every bond is visible — each numbered line joins the two amino acids it holds together (in the beaker it is folded into a tangle)", cx, Y+H2-46);
@@ -2296,13 +2303,13 @@ window.addEventListener("load",()=>{
     }
   });
   const cueCheck=()=>{
-    [["cueL","aside.left"],["cueR","aside.right"]].forEach(([id,sel])=>{
+    [["cueL","aside.left .panelscroll"],["cueR","aside.right .panelscroll"]].forEach(([id,sel])=>{
       const a=document.querySelector(sel), c=document.getElementById(id);
       if (!a||!c) return;
       c.classList.toggle("gone", a.scrollHeight - a.clientHeight - a.scrollTop < 28);
     });
   };
-  document.querySelectorAll("aside.left, aside.right").forEach(a=>a.addEventListener("scroll",cueCheck));
+  document.querySelectorAll(".panelscroll").forEach(a=>a.addEventListener("scroll",cueCheck));
   window.addEventListener("resize",cueCheck);
   setInterval(cueCheck, 800);
   document.getElementById("btnGraphMin").addEventListener("click",e=>{
