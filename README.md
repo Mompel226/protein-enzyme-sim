@@ -24,8 +24,8 @@ Six guided builds, all using the same pick-the-leaving-atoms chemistry (–OH + 
 - **Amylase** (starch → maltose, one maltose per binding), **maltase** (maltose → glucose + glucose), **starch synthase** (builds starch from glucose by condensation), and a **competitive inhibitor** of amylase.
 - Water is explicit: droplets fly **in** for hydrolysis and **out** for condensation, with running counts.
 - **Temperature** and **pH** sliders: heat raises collision speed and vibration until weak bonds snap (staggered, weakest first); pH flips R-group charges and breaks ionic bonds. Mild pH shifts are reversible; extremes and heat damage are **permanent** — cooling never refolds a cooked enzyme. The covalent disulfide survives both.
-- **Under the microscope:** click any enzyme to magnify it — every hydrogen bond, the ionic bond, the disulfide and the hydrophobic core are drawn, labelled, and tracked live (intact/broken), with a reactions-catalysed counter.
-- Live **concentration–time graph** (starch/maltose/glucose) with hover readout, timer, pause, speed and reset.
+- **Under the microscope / inspector:** enzymes are shown OPENED UP — the chain spread as a wide hairpin so every numbered bond line (matching the live bond list) visibly joins its two amino acids; broken bonds show as snapped red stubs. An in-inspector strip switches between every molecule in the beaker.
+- Live, minimizable **concentration–time graph** (starch / glycogen / maltose / glucose) with hover readout, timer, pause, speed and reset.
 
 ## Scientific honesty
 
