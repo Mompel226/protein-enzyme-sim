@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protein &amp; Enzyme Lab — IB Biology B1.2 · C1.1</title>
+<style>
+  :root{
+    --ink:#241F1B; --oat:#F4EFE7; --oat2:#EBE3D6; --panel:#FFFFFF; --rule:#D8CEBF;
+    --vir:#0E5C46; --virLt:#E3EFE9; --amber:#A85E0B; --amberLt:#FAF0DF; --ox:#9A2A16; --oxLt:#F8E9E4;
+    --mut:#6E655C; --green:#64A040; --water:#4C8FD6;
+    --sStarch:#A85E0B; --sMaltose:#188A66; --sGlucose:#7D4FA6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--oat); color:var(--ink);
+    font:14px/1.45 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:flex; flex-direction:column; min-height:100vh;
+  }
+  h1,h2,h3,.serif{font-family:Georgia,"Times New Roman",serif}
+  header{
+    background:var(--panel); border-bottom:1px solid var(--rule);
+    padding:10px 18px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  }
+  header .titleblock{margin-right:auto}
+  header h1{font-size:21px; font-weight:700}
+  header .sub{color:var(--mut); font-size:11.5px; letter-spacing:.04em}
+  .chips{display:flex; gap:6px}
+  .chip{font-size:10px; font-weight:700; letter-spacing:.08em; padding:3px 8px; border-radius:2px}
+  .chip.b12{background:var(--vir); color:#fff}
+  .chip.c11{background:var(--amber); color:#fff}
+  .tabs{display:flex; gap:0; border:1px solid var(--vir); border-radius:3px; overflow:hidden}
+  .tabs button{
+    border:0; background:var(--panel); color:var(--vir); font:600 13px inherit;
+    padding:9px 16px; cursor:pointer; font-family:inherit;
+  }
+  .tabs button.active{background:var(--vir); color:#fff}
+  .transport{display:flex; align-items:center; gap:8px}
+  .timer{font:700 16px "SF Mono",Menlo,Consolas,monospace; background:var(--ink); color:#F4EFE7;
+    padding:6px 10px; border-radius:3px; min-width:86px; text-align:center}
+  .tbtn{border:1px solid var(--rule); background:var(--panel); border-radius:3px; padding:8px 12px;
+    cursor:pointer; font:600 13px inherit; font-family:inherit; color:var(--ink)}
+  .tbtn:hover{border-color:var(--vir)}
+  .tbtn.primary{background:var(--vir); border-color:var(--vir); color:#fff}
+  .tbtn.warn{color:var(--ox); border-color:var(--ox)}
+  select.tbtn{padding:8px 6px}
+  main{flex:1; display:grid; grid-template-columns:252px 1fr 300px; gap:12px; padding:12px 18px; align-items:stretch; min-height:0}
+  .card{background:var(--panel); border:1px solid var(--rule); border-radius:4px}
+  .card h3{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--mut);
+    padding:9px 12px 7px; border-bottom:1px solid var(--rule)}
+  .card .body{padding:10px 12px}
+  aside.left{display:flex; flex-direction:column; gap:12px; overflow-y:auto}
+  .sliderrow{margin:6px 0 12px}
+  .sliderrow label{display:flex; justify-content:space-between; font-weight:600; font-size:13px}
+  .sliderrow label output{font-weight:700; color:var(--vir); font-variant-numeric:tabular-nums}
+  .sliderrow input[type=range]{width:100%; accent-color:var(--vir); margin-top:4px}
+  .sliderrow.hot input[type=range]{accent-color:var(--ox)}
+  .sliderrow .scalehints{display:flex; justify-content:space-between; color:var(--mut); font-size:10px}
+  .counter{display:flex; align-items:center; justify-content:space-between; margin:7px 0}
+  .counter .name{font-size:13px; display:flex; align-items:center; gap:7px}
+  .counter .swatch{width:14px; height:14px; border-radius:3px; display:inline-block; border:1.5px solid rgba(0,0,0,.25)}
+  .stepper{display:flex; align-items:center; gap:0; border:1px solid var(--rule); border-radius:3px; overflow:hidden}
+  .stepper button{width:26px; height:26px; border:0; background:var(--oat); cursor:pointer; font:700 15px inherit; color:var(--ink)}
+  .stepper button:hover{background:var(--oat2)}
+  .stepper .n{width:26px; text-align:center; font:700 13px inherit; font-variant-numeric:tabular-nums}
+  .toggles label{display:flex; gap:8px; align-items:center; font-size:12.5px; margin:6px 0; cursor:pointer}
+  .toggles input{accent-color:var(--vir); width:15px; height:15px}
+  .narration{background:var(--virLt); border-left:3px solid var(--vir); font-size:12px; padding:8px 10px; border-radius:0 3px 3px 0; min-height:58px}
+  .narration div{margin:2px 0}
+  .narration .hot{color:var(--ox); font-weight:600}
+  section.center{display:flex; flex-direction:column; gap:12px; min-width:0}
+  .stage{position:relative; background:var(--panel); border:1px solid var(--rule); border-radius:4px; flex:1; min-height:380px}
+  canvas{display:block; width:100%; height:100%}
+  .stage .hint{position:absolute; left:12px; bottom:10px; color:var(--mut); font-size:11px; font-style:italic; pointer-events:none}
+  aside.right{display:flex; flex-direction:column; gap:12px; overflow-y:auto}
+  #scopeCanvas{width:100%; height:250px}
+  .bondlist{list-style:none; font-size:12px}
+  .bondlist li{display:flex; align-items:center; gap:8px; padding:4px 0; border-bottom:1px dashed var(--rule)}
+  .bondlist li:last-child{border-bottom:0}
+  .bondlist .sym{width:34px; height:12px; flex:0 0 34px}
+  .bondlist .state{margin-left:auto; font-weight:700; font-size:11px}
+  .ok{color:var(--vir)} .bad{color:var(--ox)}
+  .status{font-weight:700; font-size:13px; padding:6px 10px; border-radius:3px; text-align:center; margin-top:8px}
+  .status.native{background:var(--virLt); color:var(--vir)}
+  .status.stressed{background:var(--amberLt); color:var(--amber)}
+  .status.denatured{background:var(--oxLt); color:var(--ox)}
+  footer.graph{padding:0 18px 14px}
+  .graphcard{display:grid; grid-template-columns:1fr 190px; gap:0}
+  #chartCanvas{width:100%; height:170px}
+  .glegend{border-left:1px solid var(--rule); padding:10px 12px; font-size:12px}
+  .glegend .row{display:flex; align-items:center; gap:8px; margin:5px 0; cursor:pointer}
+  .glegend .line{width:22px; height:0; border-top:3px solid; border-radius:2px}
+  .glegend .val{margin-left:auto; font-variant-numeric:tabular-nums; font-weight:700}
+  .glegend .muted{color:var(--mut); font-size:11px; margin-top:8px}
+  .wordeq{background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:10px 16px;
+    font-size:15px; text-align:center}
+  .wordeq b{color:var(--vir)}
+  .wordeq .water{color:var(--water); font-weight:700}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+  .aabtn{border:1.5px solid var(--rule); border-radius:4px; background:var(--panel); padding:7px 10px;
+    cursor:pointer; font:600 12.5px inherit; font-family:inherit; display:flex; flex-direction:column; align-items:center; gap:2px; min-width:72px}
+  .aabtn:hover{border-color:var(--vir); background:var(--virLt)}
+  .aabtn.done{opacity:.35; pointer-events:none}
+  .aabtn .rr{font-size:10.5px; color:var(--mut)}
+  .aabtn.shake{animation:shk .3s}
+  @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  .seqtrack{font-size:12.5px; color:var(--mut)}
+  .seqtrack b{color:var(--ink)}
+  .seqtrack .next{color:var(--vir); font-weight:700; text-decoration:underline}
+  .seqtrack .doneaa{color:var(--green); font-weight:700}
+  .modal{position:fixed; inset:0; background:rgba(36,31,27,.55); display:none; align-items:center; justify-content:center; z-index:50}
+  .modal.open{display:flex}
+  .modal .box{background:var(--panel); max-width:640px; width:92%; max-height:84vh; overflow-y:auto; border-radius:6px; padding:22px 26px}
+  .modal h2{font-size:20px; margin-bottom:10px}
+  .modal h4{margin:14px 0 4px; font-size:13.5px}
+  .modal p, .modal li{font-size:13px; color:var(--ink)}
+  .modal ul{padding-left:18px}
+  .modal .close{float:right}
+  .footerline{padding:6px 18px 12px; color:var(--mut); font-size:11px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px}
+  a{color:var(--vir)}
+  @media (max-width:1080px){
+    main{grid-template-columns:220px 1fr; }
+    aside.right{grid-column:1 / -1; flex-direction:row}
+    aside.right .card{flex:1}
+  }
+</style>
+</head>
+<body data-palette="#A85E0B,#188A66,#7D4FA6">
+<header>
+  <div class="titleblock">
+    <h1>Protein &amp; Enzyme Lab</h1>
+    <div class="sub">BUILD IT · WORK IT · BREAK IT</div>
+  </div>
+  <div class="chips"><span class="chip b12">IB BIOLOGY · B1.2</span><span class="chip c11">C1.1</span></div>
+  <nav class="tabs">
+    <button id="tabBuild">1 · Build a polypeptide</button>
+    <button id="tabLab" class="active">2 · Enzyme lab</button>
+  </nav>
+  <div class="transport">
+    <span class="timer" id="timer">0.0 s</span>
+    <button class="tbtn primary" id="btnPause">Pause</button>
+    <select class="tbtn" id="speedSel" title="Simulation speed">
+      <option value="0.5">×0.5</option><option value="1" selected>×1</option><option value="2">×2</option>
+    </select>
+    <button class="tbtn warn" id="btnReset">Reset</button>
+    <button class="tbtn" id="btnHelp" title="Science notes">?</button>
+  </div>
+</header>
+
+<main>
+  <aside class="left">
+    <!-- LAB CONTROLS -->
+    <div class="card" id="envCard">
+      <h3>Conditions</h3>
+      <div class="body">
+        <div class="sliderrow" id="trow">
+          <label>Temperature <output id="tOut">37 °C</output></label>
+          <input type="range" id="tSlider" min="0" max="100" value="37" step="1">
+          <div class="scalehints"><span>0</span><span>optimum ≈ 37</span><span>100 °C</span></div>
+        </div>
+        <div class="sliderrow">
+          <label>pH <output id="phOut">7.0</output></label>
+          <input type="range" id="phSlider" min="1" max="13" value="7" step="0.5">
+          <div class="scalehints"><span>1 · acid</span><span>7</span><span>13 · alkali</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="molCard">
+      <h3>Molecules in the beaker</h3>
+      <div class="body" id="counters"></div>
+    </div>
+    <div class="card" id="buildTray" style="display:none">
+      <h3>Amino acid supply</h3>
+      <div class="body">
+        <div class="seqtrack" id="seqTrack"></div>
+        <div class="btnrow" id="aaButtons"></div>
+        <div class="btnrow">
+          <button class="tbtn primary" id="btnFold" style="display:none">Fold the chain →</button>
+          <button class="tbtn primary" id="btnToLab" style="display:none">Send your maltase to the lab →</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Show / hide</h3>
+      <div class="body toggles" id="toggleBody"></div>
+    </div>
+    <div class="card">
+      <h3>What is happening</h3>
+      <div class="body"><div class="narration" id="narration"></div></div>
+    </div>
+  </aside>
+
+  <section class="center">
+    <div class="stage">
+      <canvas id="worldCanvas"></canvas>
+      <div class="hint" id="stageHint">Click an enzyme to put it under the microscope →</div>
+    </div>
+    <div class="wordeq" id="wordEq" style="display:none">
+      amino acid + amino acid <b>→ (condensation) →</b> dipeptide + <span class="water">water</span>
+      &nbsp;·&nbsp; <span id="waterCount">0</span> <span class="water">H₂O released</span>
+    </div>
+  </section>
+
+  <aside class="right">
+    <div class="card">
+      <h3>Under the microscope</h3>
+      <canvas id="scopeCanvas"></canvas>
+      <div class="body">
+        <div id="scopeName" style="font-weight:700"></div>
+        <ul class="bondlist" id="bondList"></ul>
+        <div class="status native" id="scopeStatus">NATIVE — active site intact</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Key</h3>
+      <div class="body"><ul class="bondlist" id="keyList"></ul></div>
+    </div>
+  </aside>
+</main>
+
+<footer class="graph" id="graphWrap">
+  <div class="card graphcard">
+    <canvas id="chartCanvas"></canvas>
+    <div class="glegend" id="gLegend">
+      <div style="font-weight:700; margin-bottom:2px">Concentration <span style="color:var(--mut); font-weight:400">(molecules)</span></div>
+      <div class="row" data-s="starch"><span class="line" style="border-color:var(--sStarch)"></span>starch<span class="val" id="vStarch">0</span></div>
+      <div class="row" data-s="maltose"><span class="line" style="border-color:var(--sMaltose)"></span>maltose<span class="val" id="vMaltose">0</span></div>
+      <div class="row" data-s="glucose"><span class="line" style="border-color:var(--sGlucose)"></span>glucose<span class="val" id="vGlucose">0</span></div>
+      <div class="muted">H₂O used in hydrolysis: <b id="wUsed">0</b><br>H₂O released by condensation: <b id="wMade">0</b></div>
+      <div class="muted">click a row to hide/show · hover the graph to read values</div>
+    </div>
+  </div>
+</footer>
+<div class="footerline">
+  <span>Made for IB Biology SL — B1.2 Proteins &amp; C1.1 Enzymes · NLCS Jeju Biology</span>
+  <span>Denaturation here is <b>usually permanent</b> — Reset for fresh enzymes.</span>
+</div>
+
+<div class="modal" id="helpModal">
+  <div class="box">
+    <button class="tbtn close" onclick="document.getElementById('helpModal').classList.remove('open')">Close</button>
+    <h2>Science notes</h2>
+    <h4>What is accurate here</h4>
+    <ul>
+      <li>Enzymes are drawn as <b>chains of amino acids</b> folded into a 3-D shape held by <b>weak interactions between R-groups</b>: hydrogen bonds, ionic bonds and a hydrophobic cluster — plus one covalent <b>disulfide bond</b> between two cysteines.</li>
+      <li><b>Heat</b> makes every particle move and vibrate more (kinetic energy → more collisions → faster reaction) until vibration starts <b>breaking the weak intramolecular bonds</b>. The shape — including the active site — is lost: <b>denaturation</b>. The peptide bonds and the sequence are untouched.</li>
+      <li><b>pH</b> changes the charges on acidic (–COO⁻) and basic (–NH₃⁺) R-groups, breaking or re-making <b>ionic bonds</b>. Mild changes can be reversible; extremes denature the enzyme permanently. The covalent S–S bond survives both.</li>
+      <li><b>Hydrolysis consumes water</b> (watch the blue droplet fly IN as amylase or maltase cuts). <b>Condensation releases water</b> (droplet OUT at the synthase, and in Build mode).</li>
+      <li>Denaturation is <b>usually permanent</b>: cooling the beaker does not refold a cooked enzyme.</li>
+      <li>A <b>competitive inhibitor</b> has a shape close enough to the substrate's to sit in the active site and block it, without being changed itself.</li>
+      <li>Optimum conditions are <b>protein-specific</b>. The enzymes here happen to like ~37 °C and pH 7 — but remember pepsin, whose optimum is stomach acid at pH ≈ 1.5.</li>
+    </ul>
+    <h4>Deliberate simplifications</h4>
+    <ul>
+      <li><b>Enzyme and molecule shapes are cartoons, not real structures.</b> Enzymes here are ~16 amino acids so you can see every bead and bond — real amylase is a single chain of ~500. The fold shown (weak bonds pinning a shape with an active site, hydrophobic core inside) is the real principle; the outline is not the real molecule.</li>
+      <li>Starch is drawn as a short straight chain of glucose hexagons. Real starch is hundreds to thousands of units — helical amylose plus branched amylopectin (B1.1.5).</li>
+      <li>Real amylase cuts bonds inside the chain, releasing maltose and short fragments; here each binding event frees exactly one maltose. One binding → one cut → release — the enzyme must bind again to cut again.</li>
+      <li>Real starch synthase does not run condensation for free: cells first <b>activate glucose using ATP</b> (as ADP-glucose). Condensation always has to be paid for (B1.1 → C1).</li>
+      <li>"Maltase" is the everyday name for the enzyme that hydrolyses maltose; in your gut it sits in the membrane of intestinal cells.</li>
+      <li>Numbers of molecules stand in for concentration; the graph counts them.</li>
+    </ul>
+    <h4>Syllabus links</h4>
+    <p><b>B1.2.1–2</b> generalized amino acid; condensation → dipeptide + water (Build mode). <b>B1.2.5</b> effect of pH and temperature on protein structure — "denaturation". <b>C1.1</b> enzymes, active sites, collisions, denaturation. Salts are deliberately left out — the IB syllabus names pH and temperature.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ================= palette + shared ================= */
+const COL = {
+  ink:"#241F1B", oat:"#F4EFE7", oat2:"#EBE3D6", panel:"#FFFFFF", rule:"#D8CEBF",
+  vir:"#0E5C46", amber:"#A85E0B", ox:"#9A2A16", mut:"#6E655C", green:"#64A040",
+  water:"#4C8FD6", starch:"#A85E0B", maltose:"#188A66", glucose:"#7D4FA6",
+  hexFill:"#E8C77E", hexEdge:"#A85E0B",
+  beadPhil:"#9EC5B5", beadPhob:"#D6B98C", beadAcid:"#C25B4A", beadBase:"#5B7FC2", beadCys:"#D9B23F",
+  inhib:"#B03A6E"
+};
+const TAU = Math.PI*2;
+const rand = (a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+
+/* ================= global state ================= */
+const S = {
+  mode:"lab", running:true, speed:1, t:0, lastFrame:performance.now(),
+  T:37, pH:7,
+  waterUsed:0, waterMade:0,
+  show:{bonds:true, labels:true, regions:true, rgroups:false, water:true},
+  particles:[], effects:[], scopeTarget:null,
+  narr:[],
+  chart:{data:[], hidden:{}, lastSample:0, hover:null},
+  build:null,
+  championMaltase:false
+};
+
+function narrate(msg, hot){
+  const last = S.narr[S.narr.length-1];
+  if (last && last.msg===msg) { last.t=S.t; return; }
+  S.narr.push({msg, hot:!!hot, t:S.t});
+  if (S.narr.length>3) S.narr.shift();
+  const el = document.getElementById("narration");
+  el.innerHTML = S.narr.map(n=>`<div class="${n.hot?'hot':''}">· ${n.msg}</div>`).join("");
+}
+
+/* ================= canvas helpers ================= */
+function fitCanvas(cv){
+  const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio||1;
+  if (cv.width !== Math.round(r.width*dpr) || cv.height !== Math.round(r.height*dpr)){
+    cv.width = Math.round(r.width*dpr); cv.height = Math.round(r.height*dpr);
+  }
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, w:r.width, h:r.height};
+}
+function hexagon(ctx,x,y,r,rot){
+  ctx.beginPath();
+  for(let i=0;i<6;i++){const a=rot+i*TAU/6; const px=x+r*Math.cos(a), py=y+r*Math.sin(a);
+    i?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+  ctx.closePath();
+}
+function droplet(ctx,x,y,r,alpha){
+  ctx.save(); ctx.globalAlpha=alpha;
+  ctx.fillStyle=COL.water;
+  ctx.beginPath();
+  ctx.moveTo(x, y-r*1.5);
+  ctx.bezierCurveTo(x+r*1.2,y-r*0.2, x+r, y+r*0.8, x, y+r*0.9);
+  ctx.bezierCurveTo(x-r,y+r*0.8, x-r*1.2,y-r*0.2, x, y-r*1.5);
+  ctx.fill();
+  ctx.fillStyle="rgba(255,255,255,.55)";
+  ctx.beginPath(); ctx.arc(x-r*0.3,y-r*0.1,r*0.28,0,TAU); ctx.fill();
+  ctx.restore();
+}
+
+/* ================= enzyme fold templates =================
+   16 beads. types: p=hydrophilic, o=hydrophobic, a=acidic(-), b=basic(+), c=cysteine */
+function makeFoldTemplate(kind){
+  // native positions: hand-made blob with an active-site notch on the right side
+  const N=16, native=[], unfolded=[];
+  // base ring-ish fold
+  const seedByKind={amylase:1.1, maltase:2.3, synthase:4.1, champion:2.3};
+  const seed=seedByKind[kind]||0;
+  for(let i=0;i<N;i++){
+    const a = (i/N)*TAU*1.35 + seed;
+    const rr = 20 + 9*Math.sin(i*1.7+seed) ;
+    native.push({x: Math.cos(a)*rr, y: Math.sin(a)*rr*0.82});
+  }
+  // carve an active-site notch on the right: push beads 4..7 outward to form a pocket
+  const mouth = {amylase:16, maltase:13, synthase:15, champion:13}[kind]||14;
+  native[4]={x:mouth+8,y:-13}; native[5]={x:mouth+2,y:-5};
+  native[6]={x:mouth+2,y:5};  native[7]={x:mouth+8,y:13};
+  // hydrophobic residues sit in the CORE of the fold (a huddle on the surface would still be wet)
+  [0,1,9,12].forEach((bi,k)=>{ const a=k*TAU/4+0.7+seed;
+    native[bi]={x:Math.cos(a)*6-3, y:Math.sin(a)*5}; });
+  for(let i=0;i<N;i++){
+    unfolded.push({x:(i-N/2)*7.5, y: Math.sin(i*1.9)*10});
+  }
+  const types = ["o","o","p","b","p","p","p","p","a","o","c","p","o","b","c","p"];
+  // bonds: 3 H-bonds (p..p), 1 ionic (a..b), 1 disulfide (c..c); hydrophobic cluster beads 0,1,9,12
+  const bonds=[
+    {i:2, j:15, type:"H"},
+    {i:5, j:11, type:"H"},
+    {i:6, j:9,  type:"H"},
+    {i:8, j:3,  type:"ionic"},
+    {i:10,j:14, type:"disulfide"}
+  ];
+  return {native, unfolded, types, bonds, phobic:[0,1,9,12], site:[4,5,6,7]};
+}
+
+/* ================= particle classes ================= */
+let PID=1;
+function makeSugar(units,x,y){
+  return {id:PID++, kind:"sugar", units, x, y, vx:rand(-30,30), vy:rand(-30,30),
+    rot:rand(0,TAU), vr:rand(-1,1), held:false, r: 9+units*4};
+}
+function makeInhibitor(x,y){
+  return {id:PID++, kind:"inhib", x, y, vx:rand(-30,30), vy:rand(-30,30),
+    rot:rand(0,TAU), vr:rand(-1.2,1.2), held:false, r:12};
+}
+function makeEnzyme(kind,x,y){
+  const tpl = makeFoldTemplate(kind);
+  return {
+    id:PID++, kind:"enzyme", etype:kind, x, y,
+    vx:rand(-16,16), vy:rand(-16,16), rot:rand(0,TAU), vr:rand(-0.5,0.5), r:34,
+    tpl, bonds: tpl.bonds.map(b=>({...b, intact:true, permanent:false, reTimer:0})),
+    unfold:0, denatured:false, heatDead:false,
+    holding:null, holdT:0, holdPhase:null, cooldown:0,
+    boundInhib:null, synth:0, // synthase chain length
+    champion: kind==="champion"
+  };
+}
+function enzymeLabel(e){
+  return {amylase:"amylase", maltase:"maltase", synthase:"starch synthase", champion:"your maltase"}[e.etype];
+}
+function outlineColor(e){
+  return {amylase:COL.vir, maltase:"#1E5AA8", synthase:COL.glucose, champion:"#C79A52"}[e.etype];
+}
+
+/* ================= population management ================= */
+const POP = {starch:4, glucose:5, amylase:2, maltase:2, synthase:1, inhib:0};
+function world(){ return document.getElementById("worldCanvas"); }
+function spawnAll(){
+  S.particles=[]; S.effects=[]; S.waterUsed=0; S.waterMade=0;
+  S.chart.data=[]; S.chart.lastSample=0; S.t=0;
+  const {w,h}=fitCanvas(world());
+  const px=()=>rand(60,w-60), py=()=>rand(50,h-50);
+  for(let i=0;i<POP.starch;i++) S.particles.push(makeSugar(6,px(),py()));
+  for(let i=0;i<POP.glucose;i++) S.particles.push(makeSugar(1,px(),py()));
+  for(let i=0;i<POP.amylase;i++) S.particles.push(makeEnzyme("amylase",px(),py()));
+  for(let i=0;i<POP.maltase;i++) S.particles.push(makeEnzyme("maltase",px(),py()));
+  for(let i=0;i<POP.synthase;i++) S.particles.push(makeEnzyme("synthase",px(),py()));
+  for(let i=0;i<POP.inhib;i++) S.particles.push(makeInhibitor(px(),py()));
+  if (S.championMaltase) S.particles.push(makeEnzyme("champion",px(),py()));
+  S.scopeTarget = S.particles.find(p=>p.kind==="enzyme") || null;
+}
+function adjustPop(key, delta){
+  POP[key]=clamp(POP[key]+delta,0,8);
+  document.getElementById("n_"+key).textContent=POP[key];
+  const kindMap={starch:p=>p.kind==="sugar"&&p.units>=3, glucose:p=>p.kind==="sugar"&&p.units===1,
+    amylase:p=>p.kind==="enzyme"&&p.etype==="amylase", maltase:p=>p.kind==="enzyme"&&p.etype==="maltase",
+    synthase:p=>p.kind==="enzyme"&&p.etype==="synthase", inhib:p=>p.kind==="inhib"};
+  const match=S.particles.filter(kindMap[key]);
+  const {w,h}=fitCanvas(world());
+  if (delta>0){
+    const mk={starch:()=>makeSugar(6,rand(60,w-60),rand(50,h-50)),
+      glucose:()=>makeSugar(1,rand(60,w-60),rand(50,h-50)),
+      amylase:()=>makeEnzyme("amylase",rand(60,w-60),rand(50,h-50)),
+      maltase:()=>makeEnzyme("maltase",rand(60,w-60),rand(50,h-50)),
+      synthase:()=>makeEnzyme("synthase",rand(60,w-60),rand(50,h-50)),
+      inhib:()=>makeInhibitor(rand(60,w-60),rand(50,h-50))};
+    S.particles.push(mk[key]());
+  } else if (match.length){
+    const victim=match[match.length-1];
+    if (victim.holding) victim.holding.held=false;
+    S.particles=S.particles.filter(p=>p!==victim);
+    if (S.scopeTarget===victim) S.scopeTarget=S.particles.find(p=>p.kind==="enzyme")||null;
+  }
+}
+
+/* ================= physics + chemistry ================= */
+function speedScale(){ return (0.35 + (S.T/100)*2.1) * S.speed; }
+function jiggleAmp(){ return 0.6 + (S.T/100)*3.4; }
+
+function stepBonds(e, dt){
+  if (e.kind!=="enzyme") return;
+  let broke=false;
+  for(const b of e.bonds){
+    if (b.type==="disulfide") continue;            // covalent — survives heat and pH here
+    const idx=e.bonds.indexOf(b);
+    const tThresh = b.type==="H" ? 46+idx*7 : 66;  // staggered H-bonds 46,53,60; ionic 66
+    // HEAT
+    if (b.intact && S.T > tThresh + rand(-2,2)){
+      b.intact=false; b.permanent=true; e.heatDead=true; broke=true;
+      narrate(`${enzymeLabel(e)}: vibrations snapped ${b.type==="H"?"a hydrogen bond":"the ionic bond"} — shape is deforming`, true);
+    }
+    // pH: ionic first, then H at extremes
+    const d = Math.abs(S.pH-7);
+    const phThresh = b.type==="ionic" ? 2.5 : 4.5+idx*0.4;
+    if (b.intact && d > phThresh){
+      b.intact=false;
+      b.permanent = (S.pH<=2.5 || S.pH>=11.5);
+      broke=true;
+      narrate(b.type==="ionic"
+        ? `${enzymeLabel(e)}: R-group charges changed — the ionic bond is gone`
+        : `${enzymeLabel(e)}: extreme pH is stripping hydrogen bonds`, true);
+    }
+    // gentle re-forming when conditions return AND not permanent
+    if (!b.intact && !b.permanent && d < phThresh-0.6 && S.T < tThresh-6){
+      b.reTimer += dt;
+      if (b.reTimer > 2.5){ b.intact=true; b.reTimer=0;
+        narrate(`${enzymeLabel(e)}: conditions back near optimum — a ${b.type==="H"?"hydrogen":"ionic"} bond re-formed`); }
+    } else b.reTimer=0;
+  }
+  const weak = e.bonds.filter(b=>b.type!=="disulfide");
+  const brokenW = weak.filter(b=>!b.intact).length/weak.length;
+  const target = brokenW;                            // unfold follows broken fraction
+  e.unfold = lerp(e.unfold, target, clamp(dt*1.6,0,1));
+  const wasDenatured = e.denatured;
+  e.denatured = brokenW >= 0.5;
+  if (e.denatured && !wasDenatured){
+    if (e.holding){ e.holding.held=false; e.holding=null; e.holdPhase=null; }
+    if (e.boundInhib){ e.boundInhib.held=false; e.boundInhib=null; }
+    narrate(`${enzymeLabel(e)} has DENATURED — active site lost. ${e.heatDead?"Cooling will not refold it.":"Only a return to mild pH might."}`, true);
+  }
+}
+
+function sitePos(e){
+  const m = {amylase:24, maltase:21, synthase:23, champion:21}[e.etype]||22;
+  const openness = 1+e.unfold*1.5;
+  return {x: e.x + Math.cos(e.rot)*m*openness, y: e.y + Math.sin(e.rot)*m*openness};
+}
+
+function tryReactions(dt){
+  for(const e of S.particles){
+    if (e.kind!=="enzyme") continue;
+    if (e.cooldown>0) e.cooldown-=dt;
+    const active = !e.denatured && e.unfold<0.34;
+    const sp = sitePos(e);
+    /* release inhibitor after dwell */
+    if (e.boundInhib){
+      e.holdT-=dt;
+      e.boundInhib.x=sp.x; e.boundInhib.y=sp.y; e.boundInhib.rot=e.rot;
+      if (e.holdT<=0){ const i=e.boundInhib; i.held=false; i.vx=Math.cos(e.rot)*80; i.vy=Math.sin(e.rot)*80;
+        e.boundInhib=null; e.cooldown=0.6;
+        narrate("the inhibitor drifted out — the active site is free again"); }
+      continue;
+    }
+    /* progress a held substrate */
+    if (e.holding){
+      e.holdT-=dt;
+      e.holding.x=sp.x; e.holding.y=sp.y; e.holding.rot=e.rot;
+      if (e.holdT<=0) completeReaction(e);
+      continue;
+    }
+    if (!active || e.cooldown>0) continue;
+    /* look for a binding partner */
+    for(const p of S.particles){
+      if (p.held || p===e) continue;
+      const dx=p.x-sp.x, dy=p.y-sp.y;
+      if (dx*dx+dy*dy > 34*34) continue;
+      if (p.kind==="inhib" && (e.etype==="amylase")){
+        if (dx*dx+dy*dy > 36*36) continue;
+        e.boundInhib=p; p.held=true; e.holdT=2.6;
+        narrate("a competitive inhibitor is sitting in amylase's active site — starch cannot bind", true);
+        break;
+      }
+      if (p.kind!=="sugar") continue;
+      if ((e.etype==="amylase") && p.units>=3){ bind(e,p,0.5,"cut"); break; }
+      if ((e.etype==="maltase"||e.etype==="champion") && p.units===2){ bind(e,p,0.45,"cut"); break; }
+      if (e.etype==="synthase" && p.units===1){ bind(e,p,0.4,"join"); break; }
+    }
+  }
+}
+function bind(e,p,dwell,phase){ e.holding=p; p.held=true; e.holdT=dwell/Math.max(0.5,S.speed*0.9); e.holdPhase=phase; }
+
+function completeReaction(e){
+  const p=e.holding, sp=sitePos(e);
+  e.holding=null; e.cooldown=0.35;
+  if (!p) return;
+  e.uses=(e.uses||0)+1;
+  if (e.uses===8 && !e.usesNoted){ e.usesNoted=true;
+    narrate(`the same ${enzymeLabel(e)} has now catalysed 8 reactions — enzymes are reused, never used up`); }
+  if (e.holdPhase==="cut"){
+    // hydrolysis: water IN
+    S.waterUsed++;
+    S.effects.push({type:"waterIn", x:sp.x+rand(-40,40), y:sp.y-60, tx:sp.x, ty:sp.y, t:0, dur:0.5});
+    if (p.units===2){
+      p.held=false; p.units=1; p.r=13;
+      const g=makeSugar(1,sp.x,sp.y); g.vx=-Math.cos(e.rot)*70; g.vy=-Math.sin(e.rot)*70;
+      p.vx=Math.cos(e.rot)*70; p.vy=Math.sin(e.rot)*70;
+      S.particles.push(g);
+      narrate("maltase: maltose + water → glucose + glucose (hydrolysis)");
+    } else {
+      p.held=false; p.units-=2; p.r=9+p.units*4;
+      const m=makeSugar(2,sp.x,sp.y); m.vx=Math.cos(e.rot)*80; m.vy=Math.sin(e.rot)*80;
+      p.vx=-Math.cos(e.rot)*40; p.vy=-Math.sin(e.rot)*40;
+      S.particles.push(m);
+      narrate("amylase: water in, glycosidic bond cut — one maltose freed from the starch chain");
+    }
+  } else if (e.holdPhase==="join"){
+    // condensation: water OUT
+    p.held=false;
+    S.particles=S.particles.filter(q=>q!==p);
+    e.synth=(e.synth||0)+1;
+    S.waterMade++;
+    S.effects.push({type:"waterOut", x:sp.x, y:sp.y, tx:sp.x+rand(-50,50), ty:sp.y-70, t:0, dur:0.7});
+    narrate(`starch synthase: glucose joined by condensation — water OUT (chain: ${e.synth+1} units)`);
+    if (e.synth>=5){
+      const st=makeSugar(6,sp.x,sp.y); st.vx=Math.cos(e.rot)*60; st.vy=Math.sin(e.rot)*60;
+      S.particles.push(st); e.synth=0;
+      narrate("a new starch chain is released — built from glucose, one condensation at a time");
+    }
+  }
+  e.holdPhase=null;
+}
+
+function stepParticles(dt){
+  const {w,h}=fitCanvas(world());
+  const sc=speedScale();
+  for(const p of S.particles){
+    if (p.held) continue;
+    p.x+=p.vx*sc*dt; p.y+=p.vy*sc*dt; p.rot+=(p.vr||0)*sc*dt;
+    const m=p.r||12;
+    const mb=p.kind==="enzyme" ? p.r+18 : m;
+    if (p.x<m){p.x=m;p.vx=Math.abs(p.vx);} if (p.x>w-m){p.x=w-m;p.vx=-Math.abs(p.vx);}
+    if (p.y<m){p.y=m;p.vy=Math.abs(p.vy);} if (p.y>h-mb){p.y=h-mb;p.vy=-Math.abs(p.vy);}
+    if (p.kind==="enzyme") stepBonds(p,dt);
+  }
+  tryReactions(dt);
+  for(const fx of S.effects) fx.t+=dt;
+  S.effects=S.effects.filter(fx=>fx.t<fx.dur);
+}
+
+/* ================= drawing: molecules ================= */
+function drawSugar(ctx,p,scale){
+  const s=scale||1, r=8*s;
+  ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+  const n=p.units;
+  for(let i=0;i<n;i++){
+    const off=(i-(n-1)/2)*r*1.75;
+    const wob = n>2 ? Math.sin(i*1.3+p.rot)*3*s : 0;
+    ctx.fillStyle=COL.hexFill; ctx.strokeStyle=COL.hexEdge; ctx.lineWidth=1.6*s;
+    hexagon(ctx,off,wob,r,0.52); ctx.fill(); ctx.stroke();
+    if (i<n-1){ ctx.strokeStyle=COL.hexEdge; ctx.lineWidth=2.2*s;
+      ctx.beginPath(); ctx.moveTo(off+r*0.86,wob); ctx.lineTo(off+r*0.9,wob); ctx.stroke(); }
+  }
+  if (S.show.labels){
+    ctx.rotate(-p.rot);
+    ctx.fillStyle=COL.mut; ctx.font=`${10*s}px sans-serif`; ctx.textAlign="center";
+    ctx.fillText(n>=3?"starch":(n===2?"maltose":"glucose"),0,r+13*s);
+  }
+  ctx.restore();
+}
+function drawInhib(ctx,p){
+  ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+  ctx.fillStyle=COL.inhib; ctx.strokeStyle="#7A2450"; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(-10,-9); ctx.lineTo(10,-9); ctx.lineTo(14,0); ctx.lineTo(10,9); ctx.lineTo(-10,9);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  if (S.show.labels){ ctx.rotate(-p.rot); ctx.fillStyle=COL.mut; ctx.font="10px sans-serif";
+    ctx.textAlign="center"; ctx.fillText("inhibitor",0,24); }
+  ctx.restore();
+}
+function beadFill(t){ return t==="p"?COL.beadPhil : t==="o"?COL.beadPhob : t==="a"?COL.beadAcid : t==="b"?COL.beadBase : COL.beadCys; }
+function beadPositions(e, scale, time){
+  const pts=[]; const jig=jiggleAmp()* (e.denatured?1.25:1);
+  for(let i=0;i<16;i++){
+    const n=e.tpl.native[i], u=e.tpl.unfolded[i];
+    let bx=lerp(n.x,u.x,e.unfold), by=lerp(n.y,u.y,e.unfold);
+    bx += Math.sin(time*9+i*2.3)*jig; by += Math.cos(time*8.2+i*1.7)*jig;
+    pts.push({x:bx*scale, y:by*scale});
+  }
+  return pts;
+}
+function drawEnzyme(ctx,e,opts){
+  const o=opts||{}; const s=o.scale||1;
+  ctx.save();
+  ctx.translate(o.x!==undefined?o.x:e.x, o.y!==undefined?o.y:e.y);
+  if (!o.upright) ctx.rotate(e.rot);
+  const pts=beadPositions(e,s,S.t);
+  /* hydrophobic region shading */
+  if (S.show.regions && !e.denatured && e.unfold<0.45){
+    ctx.beginPath();
+    const hp=e.tpl.phobic.map(i=>pts[i]);
+    const cx=hp.reduce((a,p)=>a+p.x,0)/hp.length, cy=hp.reduce((a,p)=>a+p.y,0)/hp.length;
+    ctx.fillStyle="rgba(214,185,140,.28)";
+    ctx.arc(cx,cy,17*s,0,TAU); ctx.fill();
+  }
+  /* backbone */
+  ctx.strokeStyle=outlineColor(e); ctx.lineWidth=2.4*s; ctx.lineJoin="round";
+  ctx.beginPath(); pts.forEach((p,i)=> i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.stroke();
+  /* bonds */
+  if (S.show.bonds){
+    for(const b of e.bonds){
+      if (!b.intact) continue;
+      const A=pts[b.i], B=pts[b.j];
+      ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y);
+      if (b.type==="H"){ ctx.setLineDash([3*s,3*s]); ctx.strokeStyle=COL.water; ctx.lineWidth=1.6*s; }
+      else if (b.type==="ionic"){ ctx.setLineDash([1.5*s,3*s]); ctx.strokeStyle="#8A63B8"; ctx.lineWidth=2*s; }
+      else { ctx.setLineDash([]); ctx.strokeStyle=COL.beadCys; ctx.lineWidth=2.6*s; }
+      ctx.stroke(); ctx.setLineDash([]);
+      if (o.labelBonds){
+        const mx=(A.x+B.x)/2, my=(A.y+B.y)/2;
+        const tag=b.type==="H"?"H-bond":(b.type==="ionic"?"ionic":"S–S");
+        const tcol=b.type==="H"?COL.water:(b.type==="ionic"?"#8A63B8":"#8a6d1e");
+        ctx.font="bold 9px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.lineWidth=3; ctx.strokeStyle="rgba(251,248,242,.9)"; ctx.strokeText(tag,mx,my-7);
+        ctx.fillStyle=tcol; ctx.fillText(tag,mx,my-7);
+      }
+    }
+  }
+  /* beads */
+  pts.forEach((p,i)=>{
+    const t=e.tpl.types[i];
+    ctx.fillStyle=beadFill(t);
+    ctx.strokeStyle="rgba(36,31,27,.35)"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(p.x,p.y,4.6*s,0,TAU); ctx.fill(); ctx.stroke();
+    if ((t==="a"||t==="b") && s>=1){
+      ctx.fillStyle="#fff"; ctx.font=`bold ${7*s}px sans-serif`; ctx.textAlign="center"; ctx.textBaseline="middle";
+      const d=Math.abs(S.pH-7);
+      const lost=(t==="a"&&S.pH<4.5)||(t==="b"&&S.pH>9.5);
+      ctx.fillText(lost?"0":(t==="a"?"–":"+"),p.x,p.y+0.5);
+    }
+    if (t==="c" && s>=1){ ctx.fillStyle="#6b5514"; ctx.font=`bold ${6.5*s}px sans-serif`;
+      ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("S",p.x,p.y+0.5); }
+  });
+  /* synthase growing chain */
+  if (e.etype==="synthase" && e.synth>0 && !e.denatured){
+    ctx.fillStyle=COL.hexFill; ctx.strokeStyle=COL.hexEdge;
+    for(let i=0;i<e.synth+1;i++){ hexagon(ctx,(24+i*9)*s,(18)*s,5*s,0.52); ctx.fill(); ctx.stroke(); }
+  }
+  ctx.restore();
+  /* name label */
+  if (S.show.labels && !o.noName){
+    ctx.fillStyle = e.denatured?COL.ox:COL.mut; ctx.font="10.5px sans-serif"; ctx.textAlign="center";
+    ctx.fillText(enzymeLabel(e)+(e.denatured?" · denatured":""), o.x!==undefined?o.x:e.x, (o.y!==undefined?o.y:e.y)+46*s);
+  }
+}
+
+/* ================= lab render ================= */
+function drawLab(){
+  const {ctx,w,h}=fitCanvas(world());
+  ctx.clearRect(0,0,w,h);
+  /* beaker walls */
+  ctx.fillStyle="#FBF8F2"; ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle=COL.rule; ctx.lineWidth=1.5; ctx.strokeRect(6,6,w-12,h-12);
+  /* thermometer strip */
+  const hot=clamp((S.T-37)/63,0,1);
+  ctx.fillStyle=`rgba(154,42,22,${hot*0.10})`; ctx.fillRect(6,6,w-12,h-12);
+  const cold=clamp((20-S.T)/20,0,1);
+  ctx.fillStyle=`rgba(76,143,214,${cold*0.10})`; ctx.fillRect(6,6,w-12,h-12);
+  for(const p of S.particles){
+    if (p.kind==="sugar" && !p.held) drawSugar(ctx,p,1);
+  }
+  for(const p of S.particles){
+    if (p.kind==="enzyme") drawEnzyme(ctx,p,{});
+  }
+  for(const p of S.particles){
+    if (p.kind==="sugar" && p.held) drawSugar(ctx,p,1);
+    if (p.kind==="inhib") drawInhib(ctx,p);
+  }
+  /* water FX */
+  if (S.show.water) for(const fx of S.effects){
+    const k=fx.t/fx.dur;
+    const x=lerp(fx.x,fx.tx,k), y=lerp(fx.y,fx.ty,k);
+    droplet(ctx,x,y,6, fx.type==="waterOut"?1-k*0.8:0.9);
+    ctx.fillStyle=COL.water; ctx.font="bold 10px sans-serif"; ctx.textAlign="left";
+    ctx.fillText(fx.type==="waterOut"?"H₂O out":"H₂O in", x+9,y+3);
+  }
+  if (S.scopeTarget && S.particles.includes(S.scopeTarget)){
+    const e=S.scopeTarget;
+    ctx.strokeStyle=COL.amber; ctx.setLineDash([5,4]); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(e.x,e.y,46,0,TAU); ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+
+/* ================= microscope panel ================= */
+function drawScope(){
+  const {ctx,w,h}=fitCanvas(document.getElementById("scopeCanvas"));
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#FBF8F2"; ctx.fillRect(0,0,w,h);
+  const e=S.scopeTarget;
+  const nameEl=document.getElementById("scopeName");
+  const stEl=document.getElementById("scopeStatus");
+  const list=document.getElementById("bondList");
+  if (S.mode==="build" && !(S.build && S.build.folded>0)){
+    ctx.fillStyle=COL.mut; ctx.font="12px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("finish the chain, then fold it —", w/2, h/2-8);
+    ctx.fillText("the folded enzyme will appear here", w/2, h/2+10);
+    nameEl.textContent=""; list.innerHTML=""; stEl.style.display="none";
+    return;
+  }
+  if (S.mode==="build" && S.build.foldEnzyme){
+    drawEnzyme(S.build.foldEnzyme===S.scopeTarget?ctx:ctx, S.build.foldEnzyme, {x:w/2,y:h/2,scale:1.9,upright:true,noName:true});
+    nameEl.textContent="your maltase (folding)"; list.innerHTML=""; stEl.style.display="none";
+    return;
+  }
+  if (!e || !S.particles.includes(e)){
+    ctx.fillStyle=COL.mut; ctx.font="12px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("click an enzyme in the beaker", w/2, h/2);
+    nameEl.textContent=""; list.innerHTML=""; stEl.style.display="none";
+    return;
+  }
+  stEl.style.display="block";
+  drawEnzyme(ctx,e,{x:w/2,y:h/2-8,scale:2.55,upright:true,noName:true,labelBonds:!e.denatured&&e.unfold<0.3});
+  /* active-site tag */
+  if (!e.denatured && e.unfold<0.34){
+    ctx.fillStyle=COL.vir; ctx.font="bold 10px sans-serif"; ctx.textAlign="left";
+    ctx.fillText("active site", w/2+52, h/2-8);
+  }
+  nameEl.textContent = enzymeLabel(e) + (e.uses ? ` · ${e.uses} reaction${e.uses>1?"s":""} catalysed` : "");
+  const rows = e.bonds.map(b=>{
+    const label=b.type==="H"?"hydrogen bond":(b.type==="ionic"?"ionic bond":"disulfide bond (covalent)");
+    const sym=b.type==="H"
+      ? `<svg class="sym" viewBox="0 0 34 12"><line x1="1" y1="6" x2="33" y2="6" stroke="${COL.water}" stroke-width="2.5" stroke-dasharray="4 3"/></svg>`
+      : b.type==="ionic"
+      ? `<svg class="sym" viewBox="0 0 34 12"><line x1="1" y1="6" x2="33" y2="6" stroke="#8A63B8" stroke-width="3" stroke-dasharray="2 4"/></svg>`
+      : `<svg class="sym" viewBox="0 0 34 12"><line x1="1" y1="6" x2="33" y2="6" stroke="${COL.beadCys}" stroke-width="4"/></svg>`;
+    const state=b.intact?`<span class="state ok">intact</span>`:`<span class="state bad">${b.permanent?"broken":"broken*"}</span>`;
+    return `<li>${sym}${label}${state}</li>`;
+  });
+  rows.push(`<li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="rgba(214,185,140,.5)"/></svg>hydrophobic huddle<span class="state ${e.unfold<0.4?'ok':'bad'}">${e.unfold<0.4?"clustered":"exposed"}</span></li>`);
+  list.innerHTML=rows.join("");
+  const brokenW=e.bonds.filter(b=>b.type!=="disulfide"&&!b.intact).length;
+  if (e.denatured){ stEl.className="status denatured"; stEl.textContent="DENATURED — 3-D shape lost, active site gone"; }
+  else if (brokenW>0){ stEl.className="status stressed"; stEl.textContent=`STRESSED — ${brokenW} weak bond${brokenW>1?"s":""} broken`; }
+  else { stEl.className="status native"; stEl.textContent="NATIVE — active site intact"; }
+}
+
+/* ================= chart ================= */
+function counts(){
+  let st=0,ma=0,gl=0;
+  for(const p of S.particles){ if(p.kind!=="sugar")continue;
+    if(p.units>=3)st++; else if(p.units===2)ma++; else gl++; }
+  return {st,ma,gl};
+}
+function sampleChart(){
+  if (S.t - S.chart.lastSample < 0.25) return;
+  S.chart.lastSample=S.t;
+  const c=counts();
+  S.chart.data.push({t:S.t, ...c});
+  if (S.chart.data.length>2000) S.chart.data.shift();
+  document.getElementById("vStarch").textContent=c.st;
+  document.getElementById("vMaltose").textContent=c.ma;
+  document.getElementById("vGlucose").textContent=c.gl;
+  document.getElementById("wUsed").textContent=S.waterUsed;
+  document.getElementById("wMade").textContent=S.waterMade;
+}
+function drawChart(){
+  const {ctx,w,h}=fitCanvas(document.getElementById("chartCanvas"));
+  ctx.clearRect(0,0,w,h);
+  const padL=34,padR=54,padT=12,padB=22;
+  const data=S.chart.data;
+  const win=90;
+  const t1=Math.max(S.t,win), t0=t1-win;
+  const view=data.filter(d=>d.t>=t0-1);
+  let maxY=5; for(const d of view) maxY=Math.max(maxY,d.st,d.ma,d.gl);
+  maxY=Math.ceil(maxY/5)*5;
+  const X=t=>padL+(t-t0)/(t1-t0)*(w-padL-padR);
+  const Y=v=>h-padB-(v/maxY)*(h-padT-padB);
+  /* grid */
+  ctx.strokeStyle="rgba(216,206,191,.6)"; ctx.lineWidth=1; ctx.font="10px sans-serif"; ctx.fillStyle=COL.mut;
+  for(let v=0;v<=maxY;v+=maxY/5){
+    ctx.beginPath(); ctx.moveTo(padL,Y(v)); ctx.lineTo(w-padR,Y(v)); ctx.stroke();
+    ctx.textAlign="right"; ctx.fillText(v,padL-5,Y(v)+3);
+  }
+  for(let t=Math.ceil(t0/15)*15; t<=t1; t+=15){
+    ctx.textAlign="center"; ctx.fillText(t+"s", X(t), h-7);
+  }
+  ctx.fillStyle=COL.mut; ctx.textAlign="left"; ctx.fillText("molecules", padL, 10);
+  /* series */
+  drawChart._placed=[];
+  const series=[["st",COL.starch,"starch"],["ma",COL.maltose,"maltose"],["gl",COL.glucose,"glucose"]];
+  for(const [k,col,name] of series){
+    if (S.chart.hidden[name]) continue;
+    ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath();
+    let started=false;
+    for(const d of view){ const x=X(d.t),y=Y(d[k]);
+      if(!started){ctx.moveTo(x,y);started=true;} else ctx.lineTo(x,y);}
+    ctx.stroke();
+    if (view.length){ const last=view[view.length-1];
+      let ly=clamp(Y(last[k]), padT+8, h-padB-4);
+      for(const py of drawChart._placed) if (Math.abs(ly-py)<12) ly=py+12;
+      drawChart._placed.push(ly);
+      ctx.fillStyle=col; ctx.font="bold 10.5px sans-serif"; ctx.textAlign="left";
+      ctx.fillText(name, w-padR+6, ly+3); }
+  }
+  /* hover crosshair */
+  if (S.chart.hover!==null && view.length){
+    const tx=clamp(S.chart.hover,t0,t1);
+    let best=view[0]; for(const d of view) if (Math.abs(d.t-tx)<Math.abs(best.t-tx)) best=d;
+    ctx.strokeStyle="rgba(36,31,27,.35)"; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(X(best.t),padT); ctx.lineTo(X(best.t),h-padB); ctx.stroke(); ctx.setLineDash([]);
+    const tip=`t=${best.t.toFixed(0)}s  starch ${best.st} · maltose ${best.ma} · glucose ${best.gl}`;
+    ctx.font="10.5px sans-serif";
+    const tw=ctx.measureText(tip).width+10;
+    let bx=clamp(X(best.t)+8,padL,w-padR-tw);
+    ctx.fillStyle="rgba(255,255,255,.94)"; ctx.strokeStyle=COL.rule;
+    ctx.fillRect(bx,padT+2,tw,16); ctx.strokeRect(bx,padT+2,tw,16);
+    ctx.fillStyle=COL.ink; ctx.textAlign="left"; ctx.fillText(tip,bx+5,padT+14);
+  }
+}
+
+/* ================= BUILD MODE ================= */
+const AA_INFO = {
+  Gly:{name:"glycine", r:"—H", type:"p"},
+  Ala:{name:"alanine", r:"—CH₃", type:"o"},
+  Ser:{name:"serine", r:"—CH₂—OH", type:"p"},
+  Cys:{name:"cysteine", r:"—CH₂—SH", type:"c"},
+  Asp:{name:"aspartate", r:"—CH₂—COO⁻", type:"a"},
+  Lys:{name:"lysine", r:"—(CH₂)₄—NH₃⁺", type:"b"}
+};
+function newBuild(){
+  return {
+    chain:["Phe","Leu","Cys","Gly","Ala"],   // pre-made start (Phe/Leu = hydrophobic pair)
+    target:["Ser","Cys","Asp","Lys"], done:0,
+    water:0, anim:null, folded:0, folding:false, complete:false
+  };
+}
+const PRE_INFO={Phe:{name:"phenylalanine",r:"—CH₂—◯",type:"o"},Leu:{name:"leucine",r:"—CH₂—CH(CH₃)₂",type:"o"}};
+function aaInfo(code){ return AA_INFO[code]||PRE_INFO[code]; }
+
+function buildSeqTrackHTML(){
+  const b=S.build;
+  const parts=b.target.map((aa,i)=>{
+    if (i<b.done) return `<span class="doneaa">${aa} ✓</span>`;
+    if (i===b.done && !b.complete) return `<span class="next">${aa}</span>`;
+    return aa;
+  });
+  return `Maltase is nearly finished — the <b>gene</b> says the last four amino acids must be:<br>…-${parts.join("-")}`;
+}
+function refreshBuildUI(){
+  const b=S.build;
+  document.getElementById("seqTrack").innerHTML=buildSeqTrackHTML();
+  document.getElementById("waterCount").textContent=b.water;
+  document.getElementById("btnFold").style.display = (b.complete&&!b.folding&&b.folded<1)?"inline-block":"none";
+  document.getElementById("btnToLab").style.display = (b.folded>=1)?"inline-block":"none";
+  document.querySelectorAll(".aabtn").forEach(btn=>{
+    btn.classList.toggle("done", b.complete);
+  });
+}
+function beginCondensation(code){
+  const b=S.build;
+  if (b.complete || b.anim || b.folding || b.folded>0) return;
+  const need=b.target[b.done];
+  if (code!==need){
+    const btn=document.querySelector(`.aabtn[data-aa="${code}"]`);
+    if (btn){ btn.classList.remove("shake"); void btn.offsetWidth; btn.classList.add("shake"); }
+    narrate(`the gene's order says ${need} comes next — sequence is not negotiable (B1.2.4)`, true);
+    return;
+  }
+  b.anim={code, phase:"closeup", picked:{oh:false,h:false}, t:0, flash:null, hits:[]};
+  document.getElementById("stageHint").style.visibility="hidden";
+  narrate(`${aaInfo(code).name} is in place — now click the two atoms that will leave as water`);
+}
+const REACT_DUR=4.4;
+function stepBuild(dt){
+  const b=S.build;
+  if (b.anim){
+    if (b.anim.flash){ b.anim.flash.t-=dt; if (b.anim.flash.t<=0) b.anim.flash=null; }
+    if (b.anim.phase==="react"){
+      b.anim.t+=dt;
+      if (b.anim.t>=REACT_DUR){
+        b.chain.push(b.anim.code); b.done++; b.water++;
+        b.anim=null;
+        document.getElementById("stageHint").style.visibility="visible";
+        if (b.done>=b.target.length){ b.complete=true;
+          narrate("polypeptide complete — 4 condensations, 4 water molecules. Now fold it!", false); }
+        refreshBuildUI();
+      }
+    }
+  }
+  if (b.folding){ b.folded=clamp(b.folded+dt/2.2,0,1); if(b.folded>=1){b.folding=false; refreshBuildUI();
+    narrate("folded! the disulfide, ionic and hydrogen bonds now pin the 3-D shape — this is what pH and heat attack"); } }
+}
+function drawCloseup(ctx,w,h,b){
+  const a=b.anim;
+  ctx.fillStyle="#FBF8F2"; ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle=COL.rule; ctx.strokeRect(6,6,w-12,h-12);
+  ctx.fillStyle=COL.ink; ctx.font="bold 18px Georgia,serif"; ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+  ctx.fillText("Condensation, close up", w/2, 42);
+  ctx.fillStyle=a.phase==="react"?COL.vir:COL.mut; ctx.font="13px sans-serif";
+  ctx.fillText(a.phase==="react"
+    ? "the two atoms leave together as ONE water molecule — and the peptide bond forms"
+    : "click the TWO atoms that leave as water — one on the chain's end, one on the newcomer", w/2, 66);
+  const K=2.1, cy=h/2+14, cxL=w/2-92, cxR=w/2+96;
+  const hideNow = a.phase==="react" && a.t>1.2;
+  ctx.save(); ctx.translate(w/2,cy); ctx.scale(K,K); ctx.translate(-w/2,-cy);
+  const lastCode=b.chain[b.chain.length-1];
+  const at1=drawResidue(ctx,cxL,cy,lastCode,false,null,{showOH:true, hideOH:hideNow});
+  const at2=drawResidue(ctx,cxR,cy,a.code,false,null,{showNH:true, showOH:true, hideH1:hideNow});
+  ctx.restore();
+  const T=(p)=>({x:w/2+(p.x-w/2)*K, y:cy+(p.y-cy)*K});
+  ctx.font="12px sans-serif"; ctx.fillStyle=COL.mut; ctx.textAlign="center";
+  ctx.fillText("the chain's last amino acid — its carboxyl is free", T({x:cxL,y:cy}).x, h-24);
+  ctx.fillText(aaInfo(a.code).name+" — arriving with a free amine", T({x:cxR,y:cy}).x, h-24);
+  if (a.phase==="closeup"){
+    a.hits=[];
+    const reg=(pos,id,ok,msg)=>{ const p=T(pos); a.hits.push({x:p.x,y:p.y,r:19,id,ok,msg}); };
+    reg(at1.OH,"chainOH",true,null);
+    reg(at1.O2,"chainO2",false,"that oxygen stays — it is double-bonded to the carbon; the –O–H beside it is what leaves");
+    reg(at1.R,"chainR",false,"R-groups never take part in the peptide bond — they decide the folding later (B1.2.9)");
+    reg(at1.N,"chainN",false,"that nitrogen is already locked inside the previous peptide bond");
+    reg(at2.H1,"incH",true,null);
+    reg(at2.N,"incN",false,"close — the nitrogen itself stays; one of its HYDROGEN atoms leaves as part of water");
+    reg(at2.OH,"incOH",false,"wrong end — this carboxyl stays free as the NEW carboxyl terminal; it is the amine that joins the chain");
+    reg(at2.R,"incR",false,"R-groups never take part in the peptide bond — they decide the folding later (B1.2.9)");
+    for(const ht of a.hits){
+      const chosen=(ht.id==="chainOH"&&a.picked.oh)||(ht.id==="incH"&&a.picked.h);
+      ctx.beginPath(); ctx.arc(ht.x,ht.y,ht.r,0,TAU);
+      if (chosen){ ctx.strokeStyle=COL.green; ctx.lineWidth=3; ctx.setLineDash([]); }
+      else { ctx.strokeStyle="rgba(110,101,92,.4)"; ctx.lineWidth=1.2; ctx.setLineDash([3,4]); }
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+    ctx.fillStyle=COL.mut; ctx.font="11px sans-serif";
+    ctx.fillText(`chosen: ${a.picked.oh?"the chain's –OH ✓":"…"}  +  ${a.picked.h?"the amine's –H ✓":"…"}`, w/2, 92);
+  }
+  if (a.phase==="react"){
+    const t=a.t;
+    const p1=T(at1.OH), p2=T(at2.H1);
+    const mx=(p1.x+p2.x)/2, topY=Math.min(p1.y,p2.y)-46;
+    if (t<1.2){
+      const k=t/1.2;
+      ctx.fillStyle="#E07A5F"; ctx.beginPath(); ctx.arc(lerp(p1.x,mx-7,k),lerp(p1.y,topY,k),9,0,TAU); ctx.fill();
+      ctx.fillStyle="#fff"; ctx.font="bold 9px sans-serif"; ctx.textBaseline="middle";
+      ctx.fillText("O–H",lerp(p1.x,mx-7,k),lerp(p1.y,topY,k));
+      ctx.beginPath(); ctx.fillStyle="#fff"; ctx.arc(lerp(p2.x,mx+9,k),lerp(p2.y,topY,k),7,0,TAU); ctx.fill();
+      ctx.strokeStyle="rgba(36,31,27,.45)"; ctx.stroke();
+      ctx.fillStyle="#3b332c"; ctx.fillText("H",lerp(p2.x,mx+9,k),lerp(p2.y,topY,k));
+      ctx.textBaseline="alphabetic";
+    } else {
+      const k=clamp((t-1.2)/1.8,0,1);
+      droplet(ctx,mx,topY-60*k,10,1-0.25*k);
+      ctx.fillStyle=COL.water; ctx.font="bold 12px sans-serif"; ctx.textAlign="left";
+      ctx.fillText("H₂O — one water released", mx+16, topY-60*k+4);
+      ctx.textAlign="center";
+    }
+    if (t>2.2){
+      const k=clamp((t-2.2)/1.6,0,1);
+      const c1=T(at1.C), n2=T(at2.N);
+      ctx.strokeStyle=COL.vir; ctx.lineWidth=4;
+      ctx.beginPath(); ctx.moveTo(c1.x+8,c1.y); ctx.lineTo(lerp(c1.x+8,n2.x-8,k),lerp(c1.y,n2.y,k)); ctx.stroke();
+      if (k>0.55){ ctx.fillStyle=COL.vir; ctx.font="bold 12px sans-serif";
+        ctx.fillText("NEW PEPTIDE BOND (C–N)", (c1.x+n2.x)/2, c1.y+40); }
+    }
+  }
+  if (a.flash){
+    ctx.fillStyle="rgba(154,42,22,.94)";
+    const msg=a.flash.msg;
+    ctx.font="12.5px sans-serif"; ctx.textAlign="center";
+    const tw2=Math.min(w-60, ctx.measureText(msg).width+26);
+    ctx.fillRect(w/2-tw2/2, h-64, tw2, 24);
+    ctx.fillStyle="#fff"; ctx.fillText(msg, w/2, h-47);
+  }
+}
+function drawResidue(ctx,x,y,code,flip,highlight,det){
+  /* one residue: N — Cα — C(=O), R below/above; det = {showOH, showNH, hideOH, hideH1} */
+  det=det||{};
+  const inf=aaInfo(code);
+  const dy=flip?-1:1;
+  ctx.strokeStyle=COL.ink; ctx.lineWidth=1.6;
+  /* backbone bonds */
+  ctx.beginPath(); ctx.moveTo(x-22,y); ctx.lineTo(x,y); ctx.lineTo(x+22,y); ctx.stroke();
+  /* C=O double bond — two lines symmetric about the C–O axis, under the atom circles */
+  ctx.beginPath();
+  ctx.moveTo(x+19.9,y); ctx.lineTo(x+19.9,y-22*dy);
+  ctx.moveTo(x+24.1,y); ctx.lineTo(x+24.1,y-22*dy);
+  ctx.stroke();
+  /* amine hydrogens */
+  if (det.showNH){
+    ctx.strokeStyle=COL.ink;
+    if (!det.hideH1){ ctx.beginPath(); ctx.moveTo(x-28,y-5); ctx.lineTo(x-37,y-11); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(x-28,y+5); ctx.lineTo(x-36,y+12); ctx.stroke();
+  }
+  /* carboxyl O–H */
+  if (det.showOH && !det.hideOH){
+    ctx.strokeStyle=COL.ink;
+    ctx.beginPath(); ctx.moveTo(x+28,y+5); ctx.lineTo(x+37,y+12); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+43,y+15); ctx.lineTo(x+50,y+18); ctx.stroke();
+  }
+  /* N */
+  ctx.fillStyle=COL.beadBase; ctx.beginPath(); ctx.arc(x-22,y,8,0,TAU); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.font="bold 9px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText("N",x-22,y);
+  if (det.showNH){
+    if (!det.hideH1){
+      ctx.fillStyle="#fff"; ctx.strokeStyle="rgba(36,31,27,.45)"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(x-40,y-13,5.5,0,TAU); ctx.fill(); ctx.stroke();
+      ctx.fillStyle="#3b332c"; ctx.font="bold 8px sans-serif"; ctx.fillText("H",x-40,y-12.5);
+    }
+    ctx.fillStyle="#fff"; ctx.strokeStyle="rgba(36,31,27,.45)"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(x-39,y+14,5.5,0,TAU); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#3b332c"; ctx.font="bold 8px sans-serif"; ctx.fillText("H",x-39,y+14.5);
+  }
+  /* Cα */
+  ctx.fillStyle="#8f867c"; ctx.beginPath(); ctx.arc(x,y,8,0,TAU); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.font="bold 9px sans-serif"; ctx.fillText("Cα",x,y);
+  /* carboxyl C */
+  ctx.fillStyle=COL.beadAcid; ctx.beginPath(); ctx.arc(x+22,y,8,0,TAU); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.fillText("C",x+22,y);
+  /* the double-bonded O atom */
+  ctx.fillStyle="#E07A5F"; ctx.strokeStyle="rgba(36,31,27,.45)"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(x+22,y-22*dy,6.5,0,TAU); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.font="bold 8px sans-serif"; ctx.fillText("O",x+22,y-22*dy+0.5);
+  if (det.showOH && !det.hideOH){
+    ctx.fillStyle="#E07A5F"; ctx.strokeStyle="rgba(36,31,27,.45)"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(x+40,y+14,6.5,0,TAU); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#fff"; ctx.font="bold 8px sans-serif"; ctx.fillText("O",x+40,y+14.5);
+    ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(x+53,y+19,5.5,0,TAU); ctx.fill();
+    ctx.strokeStyle="rgba(36,31,27,.45)"; ctx.stroke();
+    ctx.fillStyle="#3b332c"; ctx.fillText("H",x+53,y+19.5);
+  }
+  /* R group */
+  const ry=y+20*dy;
+  ctx.strokeStyle=COL.ink; ctx.beginPath(); ctx.moveTo(x,y+8*dy); ctx.lineTo(x,ry-8*dy*0.4); ctx.stroke();
+  ctx.fillStyle=beadFill(inf.type);
+  const rw = S.show.rgroups? Math.max(34, 9+inf.r.length*5.4) : 26;
+  ctx.strokeStyle="rgba(36,31,27,.35)";
+  ctx.beginPath();
+  if (ctx.roundRect) { ctx.roundRect(x-rw/2, ry-9+(dy<0?-2:0), rw, 18, 5); } else { ctx.rect(x-rw/2, ry-9, rw, 18); }
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle="#3b332c"; ctx.font=S.show.rgroups?"9.5px sans-serif":"bold 9.5px sans-serif";
+  ctx.fillText(S.show.rgroups?inf.r:("R·"+code), x, ry+(dy<0?-2:0)+0.5);
+  if (highlight){
+    ctx.strokeStyle=highlight; ctx.lineWidth=2; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.arc(x+(highlight===COL.beadBase?-22:22),y,13,0,TAU); ctx.stroke(); ctx.setLineDash([]);
+  }
+  return {
+    N:{x:x-22,y}, C:{x:x+22,y}, O2:{x:x+22,y:y-22*dy},
+    OH:{x:x+46,y:y+16}, H1:{x:x-40,y:y-13}, R:{x:x,y:ry}
+  };
+}
+function drawBuild(){
+  const {ctx,w,h}=fitCanvas(world());
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#FBF8F2"; ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle=COL.rule; ctx.strokeRect(6,6,w-12,h-12);
+  const b=S.build;
+  if (b.folded>0){
+    /* fold animation: interpolate chain into champion-fold */
+    if (!b.foldEnzyme){ b.foldEnzyme=makeEnzyme("champion",0,0); }
+    const e=b.foldEnzyme;
+    e.unfold = 1-b.folded;
+    drawEnzyme(ctx,e,{x:w/2,y:h/2-10,scale:2.4,upright:true,noName:true});
+    ctx.fillStyle=COL.ink; ctx.font="bold 15px Georgia, serif"; ctx.textAlign="center";
+    ctx.fillText("your maltase", w/2, h-64);
+    if (b.folded>=1){
+      ctx.fillStyle=COL.mut; ctx.font="12px sans-serif";
+      ctx.fillText("held by: 3 hydrogen bonds · 1 ionic bond (Asp⁻ · Lys⁺) · 1 disulfide (Cys–Cys) · a hydrophobic core tucked inside, away from water", w/2, h-42);
+    }
+    return;
+  }
+  if (b.anim){ drawCloseup(ctx,w,h,b); return; }
+  /* chain layout — scaled up while the chain is short */
+  const n=b.chain.length;
+  const step=58;
+  const totalW=(n-1)*step;
+  const x0=w/2-totalW/2 - (b.anim?26:0);
+  const yMid=h/2-14;
+  const kz=clamp((w-80)/((n+2.6)*step),1,1.5);
+  ctx.save(); ctx.translate(w/2,yMid); ctx.scale(kz,kz); ctx.translate(-w/2,-yMid);
+  ctx.fillStyle=COL.mut; ctx.font="italic 12px sans-serif"; ctx.textAlign="left";
+  ctx.fillText("amine terminal", x0-86, yMid-64);
+  ctx.fillStyle="rgba(91,127,194,.14)";
+  ctx.fillRect(x0-92,yMid-56, 62, 100);
+  b.chain.forEach((code,i)=>{
+    const x=x0+i*step, y=yMid+Math.sin(i*1.05)*10;
+    drawResidue(ctx,x,y,code,i%2===1, null, {showNH:i===0, showOH:i===n-1&&!b.complete});
+    if (i<n-1){
+      /* peptide bond marker between C of i and N of i+1 */
+      const bx=x+22+ (step-44)/2, by=(y+yMid+Math.sin((i+1)*1.05)*10)/2;
+      ctx.fillStyle=COL.vir; ctx.font="bold 8.5px sans-serif"; ctx.textAlign="center";
+      if (S.show.labels) ctx.fillText("peptide bond", bx, by-16);
+      ctx.strokeStyle=COL.vir; ctx.lineWidth=2.4;
+      ctx.beginPath(); ctx.moveTo(x+30,y); ctx.lineTo(x0+(i+1)*step-30, yMid+Math.sin((i+1)*1.05)*10); ctx.stroke();
+    }
+  });
+  const endX=x0+(n-1)*step, endY=yMid+Math.sin((n-1)*1.05)*10;
+  ctx.fillStyle=COL.mut; ctx.font="italic 12px sans-serif"; ctx.textAlign="left";
+  ctx.fillText(b.complete ? "carboxyl terminal" : "carboxyl terminal — drag the next amino acid HERE", endX+34, endY-46);
+  ctx.restore();
+  /* drop zones in screen coords (after the kz transform) */
+  const sx=(x)=>w/2+(x-w/2)*kz, sy=(y)=>yMid+(y-yMid)*kz;
+  b._dropEnd={x:sx(endX+30), y:sy(endY)};
+  b._dropStart={x:sx(x0-26), y:sy(yMid)};
+  /* drag ghost + drop ring */
+  if (S.drag && S.drag.moved && !b.complete && !b.anim){
+    const r=world().getBoundingClientRect();
+    const gx=S.drag.x-r.left, gy=S.drag.y-r.top;
+    if (gx>-40 && gy>-40 && gx<r.width+40 && gy<r.height+40){
+      const pulse=1+0.12*Math.sin(S.t*6);
+      ctx.strokeStyle=COL.green; ctx.lineWidth=2.5; ctx.setLineDash([6,5]);
+      ctx.beginPath(); ctx.arc(b._dropEnd.x,b._dropEnd.y,34*pulse,0,TAU); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle=COL.green; ctx.font="bold 10.5px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("drop here", b._dropEnd.x, b._dropEnd.y+52);
+      const inf=aaInfo(S.drag.code);
+      ctx.globalAlpha=0.9;
+      ctx.fillStyle=beadFill(inf.type);
+      ctx.beginPath(); ctx.arc(gx,gy,15,0,TAU); ctx.fill();
+      ctx.strokeStyle="rgba(36,31,27,.5)"; ctx.stroke();
+      ctx.fillStyle="#3b332c"; ctx.font="bold 11px sans-serif";
+      ctx.fillText(S.drag.code, gx, gy+34);
+      ctx.globalAlpha=1;
+    }
+  }
+}
+
+/* ================= UI wiring ================= */
+function buildCounters(){
+  const wrap=document.getElementById("counters");
+  const defs=[
+    ["starch","starch (chain of glucose)","#E8C77E"],
+    ["glucose","glucose","#E8C77E"],
+    ["amylase","amylase",COL.vir],
+    ["maltase","maltase","#1E5AA8"],
+    ["synthase","starch synthase — synthesizes starch",COL.glucose],
+    ["inhib","competitive inhibitor",COL.inhib]
+  ];
+  wrap.innerHTML=defs.map(([k,label,c])=>`
+    <div class="counter">
+      <span class="name"><span class="swatch" style="background:${c}"></span>${label}</span>
+      <span class="stepper">
+        <button data-k="${k}" data-d="-1">−</button>
+        <span class="n" id="n_${k}">${POP[k]}</span>
+        <button data-k="${k}" data-d="1">+</button>
+      </span>
+    </div>`).join("");
+  wrap.querySelectorAll("button").forEach(b=>{
+    b.addEventListener("click",()=>adjustPop(b.dataset.k, +b.dataset.d));
+  });
+}
+function buildToggles(){
+  const defs=[
+    ["bonds","show bonds inside enzymes"],
+    ["regions","show hydrophobic regions"],
+    ["labels","show name labels"],
+    ["water","show water molecules"],
+    ["rgroups","show R-group structures (build mode)"]
+  ];
+  document.getElementById("toggleBody").innerHTML=defs.map(([k,l])=>
+    `<label><input type="checkbox" data-k="${k}" ${S.show[k]?"checked":""}>${l}</label>`).join("");
+  document.querySelectorAll("#toggleBody input").forEach(i=>{
+    i.addEventListener("change",()=>{S.show[i.dataset.k]=i.checked;});
+  });
+}
+function buildKey(){
+  document.getElementById("keyList").innerHTML=`
+    <li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="${COL.beadPhil}"/></svg>hydrophilic amino acid</li>
+    <li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="${COL.beadPhob}"/></svg>hydrophobic amino acid</li>
+    <li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="${COL.beadAcid}"/></svg>acidic R-group ( – charge)</li>
+    <li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="${COL.beadBase}"/></svg>basic R-group ( + charge)</li>
+    <li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="${COL.beadCys}"/></svg>cysteine (S)</li>
+    <li><svg class="sym" viewBox="0 0 34 12"><polygon points="4,2 22,2 28,6 22,10 4,10" fill="${COL.inhib}"/></svg>competitive inhibitor</li>
+    <li><svg class="sym" viewBox="0 0 34 12"><polygon points="17,1 24,3.5 24,8.5 17,11 10,8.5 10,3.5" fill="${COL.hexFill}" stroke="${COL.hexEdge}"/></svg>glucose unit</li>`;
+}
+function buildAAButtons(){
+  const tray=["Ser","Cys","Asp","Lys","Gly","Ala"];
+  document.getElementById("aaButtons").innerHTML=tray.map(code=>`
+    <button class="aabtn" data-aa="${code}">
+      <span style="color:${beadFill(AA_INFO[code].type)};font-size:15px">●</span>
+      <b>${code}</b><span class="rr">${AA_INFO[code].name}</span>
+    </button>`).join("");
+  document.querySelectorAll(".aabtn").forEach(b=>{
+    b.addEventListener("pointerdown",ev=>{
+      if (S.mode!=="build") return;
+      S.drag={code:b.dataset.aa, x:ev.clientX, y:ev.clientY, x0:ev.clientX, y0:ev.clientY, moved:false};
+      ev.preventDefault();
+    });
+  });
+}
+document.addEventListener("pointermove",ev=>{
+  if (!S.drag) return;
+  S.drag.x=ev.clientX; S.drag.y=ev.clientY;
+  if (!S.drag.moved && Math.hypot(ev.clientX-S.drag.x0, ev.clientY-S.drag.y0)>7) S.drag.moved=true;
+});
+document.addEventListener("pointerup",ev=>{
+  if (!S.drag) return;
+  const d=S.drag; S.drag=null;
+  if (S.mode!=="build") return;
+  const b=S.build;
+  if (!b || b.anim || b.complete || b.folding || b.folded>0) return;
+  if (!d.moved){ beginCondensation(d.code); return; }  // plain click still works
+  const r=world().getBoundingClientRect();
+  const x=ev.clientX-r.left, y=ev.clientY-r.top;
+  if (x<0||y<0||x>r.width||y>r.height){ return; }
+  if (b._dropStart && Math.hypot(x-b._dropStart.x,y-b._dropStart.y)<75){
+    narrate("new amino acids join at the CARBOXYL end — the amine end of the chain is already finished", true); return;
+  }
+  if (b._dropEnd && Math.hypot(x-b._dropEnd.x,y-b._dropEnd.y)<95){ beginCondensation(d.code); return; }
+  narrate("drop it on the chain's carboxyl end — the pulsing green ring");
+});
+function setMode(mode){
+  S.mode=mode;
+  document.getElementById("tabBuild").classList.toggle("active",mode==="build");
+  document.getElementById("tabLab").classList.toggle("active",mode==="lab");
+  const lab=mode==="lab";
+  document.getElementById("envCard").style.display=lab?"":"none";
+  document.getElementById("molCard").style.display=lab?"":"none";
+  document.getElementById("graphWrap").style.display=lab?"":"none";
+  document.getElementById("buildTray").style.display=lab?"none":"";
+  document.getElementById("wordEq").style.display=lab?"none":"";
+  document.getElementById("stageHint").textContent = lab
+    ? "Click an enzyme to enlarge it under the microscope → · shapes are simplified cartoons — press ? for what is real"
+    : "Drag an amino acid from the tray to the chain's carboxyl end — the gene decides the order.";
+  document.querySelector("aside.right").style.display = "";
+  if (mode==="build" && !S.build){ S.build=newBuild(); refreshBuildUI(); }
+  if (mode==="build"){ document.getElementById("scopeName").textContent="";
+    if (S.build.foldEnzyme) S.scopeTarget=S.build.foldEnzyme; }
+  if (lab && !(S.scopeTarget && S.particles.includes(S.scopeTarget)))
+    S.scopeTarget=S.particles.find(p=>p.kind==="enzyme")||null;
+}
+function fullReset(){
+  S.T=37; S.pH=7;
+  document.getElementById("tSlider").value=37; document.getElementById("phSlider").value=7;
+  document.getElementById("tOut").textContent="37 °C"; document.getElementById("phOut").textContent="7.0";
+  spawnAll();
+  S.build=newBuild(); refreshBuildUI();
+  S.narr=[]; narrate("fresh beaker: native enzymes, 37 °C, pH 7");
+}
+
+/* ================= main loop ================= */
+function loop(now){
+  const dtReal=Math.min(0.05,(now-S.lastFrame)/1000); S.lastFrame=now;
+  if (S.needSpawn){ const r=world().getBoundingClientRect(); if (r.width>300){ spawnAll(); S.needSpawn=false; } }
+  if (S.running){
+    const dt=dtReal*S.speed;
+    S.t+=dt;
+    if (S.mode==="lab"){ stepParticles(dt); sampleChart(); }
+    else stepBuild(dt);
+  }
+  document.getElementById("timer").textContent=S.t.toFixed(1)+" s";
+  if (S.mode==="lab"){ drawLab(); } else { drawBuild(); }
+  drawScope();
+  if (S.mode==="lab") drawChart();
+  requestAnimationFrame(loop);
+}
+
+/* ================= events ================= */
+window.addEventListener("load",()=>{
+  buildCounters(); buildToggles(); buildKey(); buildAAButtons();
+  document.getElementById("tSlider").addEventListener("input",e=>{
+    S.T=+e.target.value; document.getElementById("tOut").textContent=S.T+" °C";
+    document.getElementById("trow").classList.toggle("hot",S.T>45);
+    if (S.T>=60) narrate("far above optimum: violent vibration — weak bonds cannot survive this", true);
+    else if (S.T>=45) narrate("above ~45 °C: vibration starts to threaten the weakest hydrogen bonds", true);
+    else if (S.T<=10) narrate("cold: particles crawl — few collisions, slow reaction (enzymes are NOT damaged)");
+    else narrate("near optimum: fast collisions, bonds intact");
+  });
+  document.getElementById("phSlider").addEventListener("input",e=>{
+    S.pH=+e.target.value; document.getElementById("phOut").textContent=S.pH.toFixed(1);
+    const d=Math.abs(S.pH-7);
+    if (d>4.5) narrate("extreme pH: even hydrogen bonds are breaking — permanent damage", true);
+    else if (d>2.5) narrate("pH far from optimum: R-group charges flip, ionic bonds break", true);
+    else if (d>0.1) narrate("mild pH shift: small charge changes — mostly reversible");
+    else narrate("pH 7: charges as evolved — ionic bonds stable");
+  });
+  document.getElementById("btnPause").addEventListener("click",e=>{
+    S.running=!S.running; e.target.textContent=S.running?"Pause":"Play";
+    e.target.classList.toggle("primary",S.running);
+  });
+  document.getElementById("speedSel").addEventListener("change",e=>{S.speed=+e.target.value;});
+  document.getElementById("btnReset").addEventListener("click",fullReset);
+  document.getElementById("btnHelp").addEventListener("click",()=>document.getElementById("helpModal").classList.add("open"));
+  document.getElementById("tabLab").addEventListener("click",()=>setMode("lab"));
+  document.getElementById("tabBuild").addEventListener("click",()=>setMode("build"));
+  document.getElementById("btnFold").addEventListener("click",()=>{
+    S.build.folding=true; S.build.folded=0.001; refreshBuildUI();
+  });
+  document.getElementById("btnToLab").addEventListener("click",()=>{
+    S.championMaltase=true;
+    const {w,h}=fitCanvas(world());
+    const e=makeEnzyme("champion",w/2,h/2);
+    S.particles.push(e); S.scopeTarget=e;
+    setMode("lab");
+    narrate("your maltase is in the beaker — give it maltose, then try to break it", false);
+  });
+  world().addEventListener("click",ev=>{
+    const r=world().getBoundingClientRect();
+    const x=ev.clientX-r.left, y=ev.clientY-r.top;
+    if (S.mode==="build"){
+      const b=S.build;
+      if (b && b.anim && b.anim.phase==="closeup"){
+        let hit=null;
+        for(const ht of b.anim.hits){ if (Math.hypot(x-ht.x,y-ht.y)<=ht.r) { hit=ht; break; } }
+        if (!hit) return;
+        if (hit.ok){
+          if (hit.id==="chainOH") b.anim.picked.oh=true;
+          if (hit.id==="incH") b.anim.picked.h=true;
+          if (b.anim.picked.oh && b.anim.picked.h){
+            b.anim.phase="react"; b.anim.t=0;
+            narrate("both leaving atoms chosen — the condensation runs: –OH + –H → H₂O, and C bonds to N");
+          } else {
+            narrate(b.anim.picked.oh ? "the chain's –OH ✓ — now find the atom that leaves the newcomer"
+                                     : "the amine's –H ✓ — now find the atom that leaves the chain's carboxyl");
+          }
+        } else {
+          b.anim.flash={msg:hit.msg, t:3.4};
+          narrate(hit.msg, true);
+        }
+      }
+      return;
+    }
+    let best=null,bd=1e9;
+    for(const p of S.particles){ if(p.kind!=="enzyme")continue;
+      const d=(p.x-x)**2+(p.y-y)**2; if(d<bd){bd=d;best=p;} }
+    if (best && bd<70*70) S.scopeTarget=best;
+  });
+  const cc=document.getElementById("chartCanvas");
+  cc.addEventListener("mousemove",ev=>{
+    const r=cc.getBoundingClientRect();
+    const frac=(ev.clientX-r.left-34)/(r.width-34-54);
+    const win=90, t1=Math.max(S.t,win);
+    S.chart.hover=t1-win+frac*win;
+  });
+  cc.addEventListener("mouseleave",()=>{S.chart.hover=null;});
+  document.querySelectorAll(".glegend .row").forEach(row=>{
+    row.addEventListener("click",()=>{
+      const s=row.dataset.s;
+      S.chart.hidden[s]=!S.chart.hidden[s];
+      row.style.opacity=S.chart.hidden[s]?0.35:1;
+    });
+  });
+  S.build=newBuild();
+  S.needSpawn=true;
+  refreshBuildUI();
+  narrate("fresh beaker: native enzymes, 37 °C, pH 7");
+  requestAnimationFrame(loop);
+});
+window.addEventListener("resize",()=>{ /* canvases refit each frame */ });
+</script>
+</body>
+</html>
