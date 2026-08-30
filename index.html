@@ -319,6 +319,7 @@
         <li><b>Cellulose is not digested here</b> — amylase’s active site cannot bind β-1,4 chains, and humans make no cellulase. Amylase also stalls at branch points (limit dextrin) — debranching enzymes exist, but not in this beaker.</li>
         <li>A <b>competitive inhibitor</b> resembles the substrate’s shape, blocks the active site, and is not changed.</li>
         <li>Optima are <b>protein-specific</b>: these enzymes like ~37 °C and pH 7; pepsin’s optimum is stomach acid, pH ≈ 1.5.</li>
+        <li><b>The thresholds are literature-anchored:</b> the ionic bond fails below pH ≈ 4 (carboxyl pKa ≈ 4, –COO⁻ gains H⁺) or above pH ≈ 10.5 (lysine pKa ≈ 10.5, –NH₃⁺ loses H⁺); the hydrogen-bond network fails below ~pH 3 and above ~pH 11–12.5; typical mesophilic enzymes unfold between ~48 and 65 °C (salivary amylase and egg albumin both fail near 60 °C). Disulfides survive heat — but sustained strong alkali (pH ≳ 13) destroys even them, slowly.</li>
         <li>Enzymes are <b>reused, never used up</b> — watch the reaction counter.</li>
       </ul>
     </div>
@@ -590,31 +591,44 @@ function jiggleAmp(){ return 0.6 + (S.T/100)*3.4; }
 function stepBonds(e, dt){
   if (e.kind!=="enzyme") return;
   let broke=false;
+  /* Literature anchors (see “What is real?”):
+     – side-chain pKa: carboxyl (Asp/Glu) ≈ 4 · lysine ≈ 10.5 → the ionic pair loses a charge
+       below ~pH 4.2 (–COO⁻ + H⁺ → –COOH) or above ~pH 10.3 (–NH₃⁺ → –NH₂)
+     – whole-fold acid/alkaline denaturation of typical proteins: < ~pH 3 and > ~pH 11–12.5
+     – mesophilic enzymes unfold at ~48–65 °C (salivary amylase and egg albumin both fail near 60 °C)
+     – disulfides shrug off heat, but hot strong alkali (≥ ~pH 12.8) slowly destroys them */
   for(const b of e.bonds){
-    if (b.type==="disulfide") continue;            // covalent — survives heat and pH here
     const idx=e.bonds.indexOf(b);
-    const tThresh = b.type==="H" ? 46+idx*7 : 66;  // staggered H-bonds 46,53,60; ionic 66
-    // HEAT
+    if (b.type==="disulfide"){
+      if (b.intact && S.pH>=12.8){
+        b.ssTimer=(b.ssTimer||0)+dt;
+        if (b.ssTimer>8){ b.intact=false; b.permanent=true; broke=true;
+          narrate(`${enzymeLabel(e)}: even the covalent disulfide has succumbed — hot strong alkali destroys S–S bonds, slowly`, true, {x:e.x,y:e.y}); }
+      } else b.ssTimer=0;
+      continue;
+    }
+    const tThresh = b.type==="H" ? [48,56,63][idx]||60 : 68;
+    // HEAT — permanent
     if (b.intact && S.T > tThresh + rand(-2,2)){
       b.intact=false; b.permanent=true; e.heatDead=true; broke=true;
       narrate(`${enzymeLabel(e)}: vibrations snapped ${b.type==="H"?"a hydrogen bond":"the ionic bond"} — shape is deforming`, true, {x:e.x,y:e.y});
     }
-    // pH: ionic first, then H at extremes
-    const d = Math.abs(S.pH-7);
-    const phThresh = b.type==="ionic" ? 2.5 : 4.5+idx*0.4;
-    if (b.intact && d > phThresh){
+    // pH — asymmetric, from the pKa of the groups involved
+    const acidTh = b.type==="ionic" ? 4.2 : [3.2,2.8,2.4][idx]||3.0;
+    const alkTh  = b.type==="ionic" ? 10.3 : [11.2,11.8,12.4][idx]||11.8;
+    if (b.intact && (S.pH < acidTh || S.pH > alkTh)){
       b.intact=false;
-      b.permanent = (S.pH<=2.5 || S.pH>=11.5);
+      b.permanent = (S.pH<=2.6 || S.pH>=11.6);
       broke=true;
       narrate(b.type==="ionic"
-        ? `${enzymeLabel(e)}: R-group charges changed — the ionic bond is gone`
+        ? `${enzymeLabel(e)}: ${S.pH<acidTh?"acid protonated the –COO⁻ (carboxyl pKa ≈ 4)":"alkali stripped the –NH₃⁺ (lysine pKa ≈ 10.5)"} — the ionic bond is gone`
         : `${enzymeLabel(e)}: extreme pH is stripping hydrogen bonds`, true, {x:e.x,y:e.y});
     }
-    // gentle re-forming when conditions return AND not permanent
-    if (!b.intact && !b.permanent && d < phThresh-0.6 && S.T < tThresh-6){
+    // reversible recovery for mild insults only
+    if (!b.intact && !b.permanent && S.pH > acidTh+0.4 && S.pH < alkTh-0.4 && S.T < tThresh-6){
       b.reTimer += dt;
       if (b.reTimer > 2.5){ b.intact=true; b.reTimer=0;
-        narrate(`${enzymeLabel(e)}: conditions back near optimum — a ${b.type==="H"?"hydrogen":"ionic"} bond re-formed`, false, {x:e.x,y:e.y}); }
+        narrate(`${enzymeLabel(e)}: conditions back in range — a ${b.type==="H"?"hydrogen":"ionic"} bond re-formed`, false, {x:e.x,y:e.y}); }
     } else b.reTimer=0;
   }
   const weak = e.bonds.filter(b=>b.type!=="disulfide");
@@ -2215,17 +2229,17 @@ window.addEventListener("load",()=>{
   document.getElementById("tSlider").addEventListener("input",e=>{
     S.T=+e.target.value; document.getElementById("tOut").textContent=S.T+" °C";
     document.getElementById("trow").classList.toggle("hot",S.T>45);
-    if (S.T>=60) narrate("far above optimum: violent vibration — weak bonds cannot survive this", true);
-    else if (S.T>=45) narrate("above ~45 °C: vibration starts to threaten the weakest hydrogen bonds", true);
+    if (S.T>=63) narrate("far above optimum: violent vibration — the whole weak-bond set fails around here", true);
+    else if (S.T>=48) narrate("above ~48 °C: vibration starts to snap the weakest hydrogen bonds (typical enzymes unfold at ~50–65 °C)", true);
     else if (S.T<=10) narrate("cold: particles crawl — few collisions, slow reaction (enzymes are NOT damaged)");
     else narrate("near optimum: fast collisions, bonds intact");
   });
   document.getElementById("phSlider").addEventListener("input",e=>{
     S.pH=+e.target.value; document.getElementById("phOut").textContent=S.pH.toFixed(1);
-    const d=Math.abs(S.pH-7);
-    if (d>4.5) narrate("extreme pH: even hydrogen bonds are breaking — permanent damage", true);
-    else if (d>2.5) narrate("pH far from optimum: R-group charges flip, ionic bonds break", true);
-    else if (d>0.1) narrate("mild pH shift: small charge changes — mostly reversible");
+    if (S.pH<3.2 || S.pH>11.2) narrate("extreme pH: the hydrogen-bond network itself is failing — this damage is permanent", true);
+    else if (S.pH<4.2) narrate("below pH ≈ 4: carboxyl R-groups (pKa ≈ 4) pick up H⁺ and lose their charge — ionic bonds break", true);
+    else if (S.pH>10.3) narrate("above pH ≈ 10.5: lysine R-groups (pKa ≈ 10.5) lose their H⁺ and their + charge — ionic bonds break", true);
+    else if (Math.abs(S.pH-7)>0.1) narrate("mild pH shift: charges mostly intact — reversible territory");
     else narrate("pH 7: charges as evolved — ionic bonds stable");
   });
   document.getElementById("btnPause").addEventListener("click",e=>{
