@@ -983,13 +983,32 @@ function drawLab(){
 
 /* ================= microscope panel ================= */
 function drawScope(){
-  const {ctx,w,h}=fitCanvas(document.getElementById("scopeCanvas"));
-  ctx.clearRect(0,0,w,h);
-  ctx.fillStyle="#FBF8F2"; ctx.fillRect(0,0,w,h);
-  const e=S.scopeTarget;
+  const cv=document.getElementById("scopeCanvas");
   const nameEl=document.getElementById("scopeName");
   const stEl=document.getElementById("scopeStatus");
   const list=document.getElementById("bondList");
+  /* while the big viewer is open the small tangle is a duplicate — collapse this
+     card to the live bond list of the OPENED molecule; it all returns on close */
+  const insp=(S.mode==="lab" && S.inspect && S.inspect.p)?S.inspect.p:null;
+  const collapse=!!insp;
+  cv.style.display=collapse?"none":"";
+  const dis=document.querySelector("aside.right .disclaim"); if(dis) dis.style.display=collapse?"none":"";
+  document.getElementById("btnInspect").style.display=collapse?"none":"";
+  let ctx,w,h;
+  if(!collapse){ const f=fitCanvas(cv); ctx=f.ctx; w=f.w; h=f.h;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle="#FBF8F2"; ctx.fillRect(0,0,w,h);
+  }
+  if (insp && insp.kind!=="enzyme"){
+    nameEl.textContent=(insp.kind==="sugar"?sugarLabel(insp):"competitive inhibitor")+" — in the viewer";
+    list.innerHTML="<li>"+(insp.kind==="sugar"
+      ?"glycosidic bonds are covalent — no weak-bond fold, nothing to denature"
+      :"a small molecule, not a protein — nothing here can denature")+"</li>";
+    stEl.style.display="block"; stEl.className="status native";
+    stEl.textContent=insp.kind==="sugar"?"SUGAR — no tertiary structure to lose":"NOT A PROTEIN";
+    return;
+  }
+  const e=insp || S.scopeTarget;
   if (S.mode==="build" && !(S.build && S.build.folded>0)){
     ctx.fillStyle=COL.mut; ctx.font="12px sans-serif"; ctx.textAlign="center";
     ctx.fillText("finish the chain, then fold it —", w/2, h/2-8);
@@ -1003,12 +1022,13 @@ function drawScope(){
     return;
   }
   if (!e || !S.particles.includes(e)){
-    ctx.fillStyle=COL.mut; ctx.font="12px sans-serif"; ctx.textAlign="center";
-    ctx.fillText("click an enzyme in the beaker", w/2, h/2);
+    if (ctx){ ctx.fillStyle=COL.mut; ctx.font="12px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("click an enzyme in the beaker", w/2, h/2); }
     nameEl.textContent=""; list.innerHTML=""; stEl.style.display="none";
     return;
   }
   stEl.style.display="block";
+  if (!collapse){
   const msc=Math.max(1.4, Math.min(2.6, (h-52)/52, (w-40)/92));
   drawEnzyme(ctx,e,{x:w/2-6,y:h/2-6,scale:msc,upright:true,noName:true,labelBonds:!e.denatured&&e.unfold<0.3});
   /* active-site tag near the actual mouth */
@@ -1021,6 +1041,7 @@ function drawScope(){
   ctx.fillStyle=COL.mut; ctx.font="italic 9.5px sans-serif"; ctx.textAlign="center";
   ctx.fillText("the real fold is a tangle —", w/2, h-20);
   ctx.fillText("“Open up the molecule” shows every bond", w/2, h-8);
+  }
   nameEl.textContent = enzymeLabel(e) + (e.uses ? ` · ${e.uses} reaction${e.uses>1?"s":""} catalysed` : "");
   const rows = e.bonds.map((b,bi)=>{
     const chipCol=b.type==="H"?COL.water:(b.type==="ionic"?"#8A63B8":"#B08A1E");
