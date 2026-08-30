@@ -261,13 +261,13 @@
     <div class="card">
       <h3 id="scopeTitle">Under the microscope</h3>
       <canvas id="scopeCanvas"></canvas>
-      <div class="disclaim">Simplified model — <b>not</b> the molecule’s real shape (real enzymes are hundreds of amino acids). The bond types and their behaviour are the real science.</div>
       <button class="tbtn scopebtn" id="btnInspect">⤢ Open up the molecule</button>
       <div class="body">
         <div id="scopeName" style="font-weight:700"></div>
         <ul class="bondlist" id="bondList"></ul>
         <div class="status native" id="scopeStatus">NATIVE — active site intact</div>
       </div>
+      <div class="disclaim">Simplified model — <b>not</b> the molecule’s real shape (real enzymes are hundreds of amino acids). The bond types and their behaviour are the real science.</div>
     </div>
     <div class="card" id="keyCard">
       <h3>Key</h3>
@@ -1032,7 +1032,8 @@ function drawScope(){
   }
   stEl.style.display="block";
   if (!collapse){
-  const msc=Math.max(1.4, Math.min(2.6, (h-52)/52, (w-40)/92));
+  const spread=1+e.unfold*1.35;                       // unfolded chains spill outward — zoom out to keep them in frame
+  const msc=Math.max(1.1, Math.min(2.6, (h-52)/52, (w-40)/92)/spread);
   drawEnzyme(ctx,e,{x:w/2-6,y:h/2-6,scale:msc,upright:true,noName:true,labelBonds:!e.denatured&&e.unfold<0.3});
   /* active-site tag near the actual mouth */
   if (!e.denatured && e.unfold<0.34){
@@ -2364,8 +2365,8 @@ window.addEventListener("load",()=>{
     for(const p of S.particles){
       const d=(p.x-x)**2+(p.y-y)**2; if(d<bd){bd=d;best=p;} }
     if (best && bd<70*70){
-      if (best.kind==="enzyme") S.scopeTarget=best;
-      openInspector(best);
+      if (best.kind==="enzyme") S.scopeTarget=best;   // small view first — the button opens the big one
+      else openInspector(best);                        // sugars/inhibitor have no small view
     }
   });
   const cueCheck=()=>{
