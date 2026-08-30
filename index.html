@@ -16,9 +16,12 @@
   body{
     background:var(--oat); color:var(--ink);
     font:14px/1.45 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+    height:100vh; overflow:hidden;
   }
-  @media (max-height:640px){ body{height:auto; overflow:auto} }
+  #appwrap{
+    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+    transform-origin:top left;
+  }
   h1,h2,h3,.serif{font-family:Georgia,"Times New Roman",serif}
   header{
     background:var(--ink); border-bottom:3px solid var(--vir);
@@ -165,14 +168,11 @@
   .modal .close{float:right}
   .footerline{padding:6px 18px 12px; color:var(--mut); font-size:11px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px}
   a{color:var(--vir)}
-  @media (max-width:1080px){
-    main{grid-template-columns:220px 1fr; }
-    aside.right{grid-column:1 / -1; flex-direction:row}
-    aside.right .card{flex:1}
-  }
+
 </style>
 </head>
 <body data-palette="#A85E0B,#188A66,#7D4FA6">
+<div id="appwrap">
 <header>
   <div class="titleblock">
     <h1>Protein &amp; Enzyme Lab</h1>
@@ -302,6 +302,7 @@
   <span>Denaturation here is <b>usually permanent</b> — Reset for fresh enzymes.</span>
 </div>
 
+</div><!-- /appwrap -->
 <div class="modal" id="helpModal">
   <div class="box">
     <button class="tbtn close" onclick="document.getElementById('helpModal').classList.remove('open')">Close</button>
@@ -991,7 +992,8 @@ function drawScope(){
     ctx.fillText("active site", clamp(tx2, 34, w-34), clamp(ty2 + (mv.y<0?-16:20), 12, h-16));
   }
   ctx.fillStyle=COL.mut; ctx.font="italic 9.5px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("the real fold is a tangle — “Open up the molecule” to see every bond", w/2, h-8);
+  ctx.fillText("the real fold is a tangle —", w/2, h-20);
+  ctx.fillText("“Open up the molecule” shows every bond", w/2, h-8);
   nameEl.textContent = enzymeLabel(e) + (e.uses ? ` · ${e.uses} reaction${e.uses>1?"s":""} catalysed` : "");
   const rows = e.bonds.map((b,bi)=>{
     const chipCol=b.type==="H"?COL.water:(b.type==="ionic"?"#8A63B8":"#B08A1E");
@@ -2344,7 +2346,22 @@ window.addEventListener("load",()=>{
   narrate("fresh beaker: native enzymes, 37 °C, pH 7");
   requestAnimationFrame(loop);
 });
-window.addEventListener("resize",()=>{ /* canvases refit each frame */ });
+const DESIGN_W=1220;
+function fitApp(){
+  const app=document.getElementById("appwrap");
+  const w=window.innerWidth, h=window.innerHeight;
+  if (w>=DESIGN_W){
+    app.style.transform=""; app.style.width=""; app.style.height="100vh";
+  } else {
+    const k=w/DESIGN_W;
+    app.style.transform=`scale(${k})`;
+    app.style.width=DESIGN_W+"px";
+    app.style.height=(h/k)+"px";
+  }
+}
+window.addEventListener("resize",fitApp);
+window.addEventListener("orientationchange",()=>setTimeout(fitApp,120));
+fitApp();
 </script>
 </body>
 </html>
