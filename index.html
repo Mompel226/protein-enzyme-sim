@@ -438,11 +438,14 @@ function makeFoldTemplate(kind){
     native.push({x,y});
   }
   if (kind==="maltase"||kind==="champion"){
-    for(const p of native){ p.y=-p.y*0.9; p.x*=0.9; }
-    native[6]={x:18,y:9}; native[7]={x:26,y:4}; native[8]={x:26,y:-4}; native[9]={x:18,y:-9};
+    for(let i2=0;i2<N;i2++){ const p=native[i2];
+      const a=Math.atan2(p.y,p.x); const rr=13+Math.sin(i2*2.2)*3;
+      native[i2]={x:Math.cos(a+0.4)*rr*1.15, y:Math.sin(a+0.4)*rr};
+    }
+    native[6]={x:16,y:8}; native[7]={x:23,y:3}; native[8]={x:23,y:-3}; native[9]={x:16,y:-8};
   } else if (kind==="synthase"){
-    for(const p of native){ p.y*=1.25; }
-    native[6]={x:24,y:-16}; native[7]={x:34,y:-6}; native[8]={x:34,y:8}; native[9]={x:24,y:18};
+    for(const p of native){ const t=p.x; p.x=p.y*1.1; p.y=-t*0.55; }
+    native[6]={x:-11,y:-24}; native[7]={x:-3,y:-32}; native[8]={x:6,y:-32}; native[9]={x:13,y:-24};
   } else {
     native[6]={x:27,y:-13}; native[7]={x:35,y:-5}; native[8]={x:35,y:5}; native[9]={x:27,y:13};
   }
@@ -457,13 +460,19 @@ function makeFoldTemplate(kind){
   for(let i=0;i<N;i++) display.push({x:D[i].x, y:D[i].y});
   /* per-enzyme silhouettes: same chemistry, visibly different shapes and pockets */
   if (kind==="maltase"||kind==="champion"){
-    for(const p of display){ p.y=-p.y*0.92; p.x*=0.88; }
-    display[6]={x:104,y:36}; display[7]={x:138,y:12};   /* smaller, rounder pocket */
-    display[8]={x:138,y:-14}; display[9]={x:104,y:-38};
+    /* compact and ROUND: chain hugged into a ball with a small round pocket */
+    for(let i2=0;i2<N;i2++){ const p=display[i2];
+      const a=Math.atan2(p.y,p.x), r2=Math.hypot(p.x,p.y);
+      const rr=42+ (r2/160)*54 + Math.sin(i2*2.7)*10;
+      display[i2]={x:Math.cos(a+0.5)*rr*1.35, y:Math.sin(a+0.5)*rr};
+    }
+    display[6]={x:78,y:34}; display[7]={x:112,y:10};
+    display[8]={x:112,y:-16}; display[9]={x:78,y:-40};
   } else if (kind==="synthase"){
-    for(const p of display){ p.y*=1.14; p.x*=1.02; }
-    display[6]={x:126,y:-64}; display[7]={x:184,y:-30}; /* tall two-lobed pocket */
-    display[8]={x:184,y:34};  display[9]={x:126,y:66};
+    /* tall and NARROW: standing silhouette with a wide top-opening pocket */
+    for(const p of display){ const t=p.x; p.x=p.y*1.15; p.y=-t*0.62; }
+    display[6]={x:-60,y:-96}; display[7]={x:-14,y:-128};
+    display[8]={x:40,y:-128}; display[9]={x:84,y:-96};
   }
   /* UNFOLDED (denatured) */
   for(let i=0;i<N;i++) unfolded.push({x:(i-N/2)*7.5, y:Math.sin(i*1.9)*10});
@@ -475,7 +484,10 @@ function makeFoldTemplate(kind){
     {i:0, j:15, type:"ionic"},
     {i:2, j:13, type:"disulfide"}
   ];
-  return {native, display, unfolded, types, bonds, phobic:[4,11], site:[6,7,8,9]};
+  const mcx=(native[6].x+native[7].x+native[8].x+native[9].x)/4;
+  const mcy=(native[6].y+native[7].y+native[8].y+native[9].y)/4;
+  const mouthVec={x:mcx*1.12, y:mcy*1.12};
+  return {native, display, unfolded, types, bonds, phobic:[4,11], site:[6,7,8,9], mouthVec};
 }
 /* ================= particle classes ================= */
 let PID=1;
@@ -615,9 +627,10 @@ function stepBonds(e, dt){
 }
 
 function sitePos(e){
-  const m = {amylase:24, maltase:21, synthase:23, champion:21}[e.etype]||22;
-  const openness = 1+e.unfold*1.5;
-  return {x: e.x + Math.cos(e.rot)*m*openness, y: e.y + Math.sin(e.rot)*m*openness};
+  const mv=e.tpl.mouthVec;
+  const c=Math.cos(e.rot), s2=Math.sin(e.rot);
+  const op=1+e.unfold*1.5;
+  return {x: e.x + (mv.x*c - mv.y*s2)*op, y: e.y + (mv.x*s2 + mv.y*c)*op};
 }
 
 function tryReactions(dt){
@@ -967,10 +980,12 @@ function drawScope(){
   stEl.style.display="block";
   const msc=Math.max(1.4, Math.min(2.6, (h-52)/52, (w-40)/92));
   drawEnzyme(ctx,e,{x:w/2-6,y:h/2-6,scale:msc,upright:true,noName:true,labelBonds:!e.denatured&&e.unfold<0.3});
-  /* active-site tag */
+  /* active-site tag near the actual mouth */
   if (!e.denatured && e.unfold<0.34){
-    ctx.fillStyle=COL.vir; ctx.font="bold 10px sans-serif"; ctx.textAlign="right";
-    ctx.fillText("active site →", w-8, h/2-6);
+    const mv=e.tpl.mouthVec;
+    const tx2=w/2-6+mv.x*msc, ty2=h/2-6+mv.y*msc;
+    ctx.fillStyle=COL.vir; ctx.font="bold 10px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("active site", clamp(tx2, 34, w-34), clamp(ty2 + (mv.y<0?-16:20), 12, h-16));
   }
   ctx.fillStyle=COL.mut; ctx.font="italic 9.5px sans-serif"; ctx.textAlign="center";
   ctx.fillText("the real fold is a tangle — “Open up the molecule” to see every bond", w/2, h-8);
@@ -1547,7 +1562,9 @@ function drawInspector(ctx,w,h){
     if (I.view==="simple"){
       const bodyTop=Y+78, capH=52;
       const bodyH=(H2-104)-capH;
-      const esc=Math.max(0.55, Math.min(1.6, bodyH/175, (W2-230)/400));
+      const xs=p.tpl.display.map(q=>q.x), ys=p.tpl.display.map(q=>q.y);
+      const spanX=Math.max(...xs)-Math.min(...xs)+90, spanY=Math.max(...ys)-Math.min(...ys)+70;
+      const esc=Math.max(0.5, Math.min(1.6, bodyH/spanY, (W2-230)/spanX));
       const foldCx=cx-72;
       drawEnzyme(ctx,p,{x:foldCx,y:bodyTop+bodyH/2,scale:esc,upright:true,noName:true,exploded:true,beadR:Math.max(6,8*Math.min(esc/1.2,1)),labelBonds:true});
       /* colour-coded legend, right side */
@@ -1616,40 +1633,40 @@ function drawSugarChem(ctx,X,Y,W2,H2,p){
     cap(["α-glucose — the OH on carbon 1 points DOWN (below the ring).",
          "In β-glucose it points up: that one difference builds cellulose instead of starch."]);
   } else if (st==="maltose"){
-    const A=drawHaworth(ctx,cx-72,cy,1.25,{hideC1OH:true});
-    const B=drawHaworth(ctx,cx+72,cy,1.25,{showC4OH:false});
-    glycoBridge(ctx,A.C1,B.C4,"α-1,4 glycosidic bond",1.25,26);
+    const A=drawHaworth(ctx,cx-78,cy,1.25,{hideC1OH:true});
+    const B=drawHaworth(ctx,cx+78,cy,1.25,{showC4OH:false});
+    glycoBridge(ctx,A.C1,B.C4,"α-1,4 glycosidic bond",1.25,24,0,42);
     cap(["carbon 1 of one glucose — oxygen bridge — carbon 4 of the next.",
          "Formed by condensation (water out); cut by maltase with water in."]);
   } else if (st==="amylose"||(st==="amylopectin"&&!(p.branches||[]).length)){
-    const A=drawHaworth(ctx,cx-120,cy,1.05,{hideC1OH:true,nums:false});
-    const B=drawHaworth(ctx,cx,cy,1.05,{hideC1OH:true,nums:false});
-    const C=drawHaworth(ctx,cx+120,cy,1.05,{nums:false});
-    glycoBridge(ctx,A.C1,B.C4,"α-1,4",1.05,20);
-    glycoBridge(ctx,B.C1,C.C4,"α-1,4",1.05,20);
+    const A=drawHaworth(ctx,cx-124,cy,1.02,{hideC1OH:true});
+    const B=drawHaworth(ctx,cx,cy,1.02,{hideC1OH:true});
+    const C=drawHaworth(ctx,cx+124,cy,1.02,{});
+    glycoBridge(ctx,A.C1,B.C4,"α-1,4",1.02,20,0,32);
+    glycoBridge(ctx,B.C1,C.C4,"α-1,4",1.02,20,0,32);
     ctx.fillStyle=COL.mut; ctx.font="bold 16px sans-serif"; ctx.textAlign="center";
     ctx.fillText("⋯", cx-180, cy+4); ctx.fillText("⋯", cx+180, cy+4);
     cap(["amylose: α-1,4 bonds only — an unbranched chain that coils into a helix.",
          "Real chains run to thousands of units; the dots mean “continues”."]);
   } else if (st==="amylopectin"||st==="glycogen"){
-    const A=drawHaworth(ctx,cx-120,cy+26,1.0,{hideC1OH:true,nums:false});
-    const B=drawHaworth(ctx,cx,cy+26,1.0,{hideC1OH:true,nums:false,hideC6text:true});
-    const C=drawHaworth(ctx,cx+120,cy+26,1.0,{nums:false});
-    glycoBridge(ctx,A.C1,B.C4,"α-1,4",1.0,18);
-    glycoBridge(ctx,B.C1,C.C4,"α-1,4",1.0,18);
-    const Br=drawHaworth(ctx,cx-64,cy-78,0.95,{hideC1OH:true,nums:false});
-    glycoBridge(ctx,Br.C1,B.C6,"α-1,6 (branch)",0.95,10,-58,4);
+    const A=drawHaworth(ctx,cx-124,cy+26,1.0,{hideC1OH:true});
+    const B=drawHaworth(ctx,cx,cy+26,1.0,{hideC1OH:true,hideC6text:true});
+    const C=drawHaworth(ctx,cx+124,cy+26,1.0,{}); 
+    glycoBridge(ctx,A.C1,B.C4,"α-1,4",1.0,18,0,32);
+    glycoBridge(ctx,B.C1,C.C4,"α-1,4",1.0,18,0,32);
+    const Br=drawHaworth(ctx,cx-66,cy-80,0.95,{hideC1OH:true});
+    glycoBridge(ctx,Br.C1,B.C6,"α-1,6 (branch)",0.95,10,-62,4);
     ctx.fillStyle=COL.mut; ctx.font="bold 15px sans-serif"; ctx.textAlign="center";
     ctx.fillText("⋯", cx-176, cy+30); ctx.fillText("⋯", cx+176, cy+30); ctx.fillText("⋯", cx-124, cy-82);
     cap(st==="glycogen"
       ?["glycogen: α-1,4 chains with α-1,6 branch points every 8–12 units — branchier than amylopectin.","More ends → faster glucose release. Amylase alone stalls at the α-1,6 points."]
       :["amylopectin: α-1,4 chains with α-1,6 branch points (roughly every 20–30 units in reality).","The branch is why amylase leaves a limit dextrin here."]);
   } else if (st==="cellulose"){
-    const A=drawHaworth(ctx,cx-120,cy,1.05,{beta:true,hideC1OH:true,nums:false});
-    const B=drawHaworth(ctx,cx,cy,1.05,{beta:true,flip:true,hideC1OH:true,nums:false});
-    const C=drawHaworth(ctx,cx+120,cy,1.05,{beta:true,nums:false});
-    glycoBridge(ctx,A.C1,B.C4,"β-1,4",1.05,-20);
-    glycoBridge(ctx,B.C1,C.C4,"β-1,4",1.05,-20);
+    const A=drawHaworth(ctx,cx-124,cy,1.02,{beta:true,hideC1OH:true});
+    const B=drawHaworth(ctx,cx,cy,1.02,{beta:true,flip:true,hideC1OH:true});
+    const C=drawHaworth(ctx,cx+124,cy,1.02,{beta:true});
+    glycoBridge(ctx,A.C1,B.C4,"β-1,4",1.02,-20,0,-26);
+    glycoBridge(ctx,B.C1,C.C4,"β-1,4",1.02,-20,0,-26);
     ctx.fillStyle=COL.amber; ctx.font="bold 11px sans-serif"; ctx.textAlign="center";
     ctx.fillText("↑ this unit is INVERTED — every second glucose flips", cx, cy-64);
     cap(["cellulose: β-glucose, β-1,4 bonds, each unit flipped relative to its neighbours →",
@@ -1664,7 +1681,7 @@ function drawEnzymeChem(ctx,X,Y,W2,H2,e){
   H2=340;
   const cx=X+W2/2;
   ctx.fillStyle=COL.ink; ctx.font="bold 12.5px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("The chain itself — amino acids joined by peptide bonds (covalent, untouched by heat or pH here)", cx, Y+18);
+  ctx.fillText("The chain itself — amino acids joined by peptide bonds (covalent, untouched by heat or pH here)", cx, Y+16);
   /* 4-residue segment */
   ctx.save(); ctx.translate(cx, Y+74); ctx.scale(1.25,1.25); ctx.translate(-cx, -(Y+74));
   const codes=["Gly","Ala","Ser","Cys"];
@@ -1676,14 +1693,10 @@ function drawEnzymeChem(ctx,X,Y,W2,H2,e){
       ctx.beginPath(); ctx.moveTo(x+30,y); ctx.lineTo(cx-135+(i+1)*90-30, Y+74+((i+1)%2?8:-8)); ctx.stroke(); }
   });
   ctx.restore();
-  /* label with leader, clear of the atoms */
-  const lm={x:cx+(-90-0)*1.25, y:Y+74};
-  ctx.strokeStyle=PB; ctx.lineWidth=1.4; ctx.setLineDash([4,3]);
-  ctx.beginPath(); ctx.moveTo(cx-238,Y+40); ctx.lineTo(lm.x,lm.y-6); ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle=PB; ctx.font="bold 12px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("peptide bonds (bright green)", cx-238, Y+34);
+  ctx.fillStyle=PB; ctx.font="bold 11.5px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("the bright green links are the PEPTIDE BONDS", cx, Y+136);
   /* three interaction cards */
-  const cardY=Y+158, cardH=H2-186, cw=(W2-64)/3;
+  const cardY=Y+162, cardH=H2-192, cw=(W2-64)/3;
   const cards=[
     {title:"hydrogen bond", col:COL.water, note:"weak · broken by HEAT",
      draw:(x0,yc)=>{
@@ -1723,8 +1736,8 @@ function drawEnzymeChem(ctx,X,Y,W2,H2,e){
     ctx.fillStyle=COL.mut; ctx.font="italic 10px sans-serif";
     ctx.fillText(c0.note, x0+cw/2, cardY+cardH-10);
   });
-  ctx.fillStyle=COL.mut; ctx.font="11px sans-serif"; ctx.textAlign="center";
-  ctx.fillText("these are the interactions drawn as lines in the Simple view — between R-groups, pinning the fold", cx, Y+142);
+  ctx.fillStyle=COL.mut; ctx.font="10.5px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("one generic example segment — drawn the same for amylase, maltase and starch synthase: their real sequences are hundreds of amino acids long, all different", cx, Y+150);
   ctx.restore();
 }
 /* ================= bond-builder exercises ================= */
