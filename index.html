@@ -757,6 +757,13 @@ function completeReaction(e){
   e.holdPhase=null;
 }
 
+function sugarHalf(p){
+  const half=(p.units-1)*7+10;                       // centred chain: (n-1)/2 · 14px spacing + hex
+  let perp=10;
+  for(const b of (p.branches||[])) perp=Math.max(perp, b[1]*14+10);
+  const c=Math.abs(Math.cos(p.rot)), s2=Math.abs(Math.sin(p.rot));
+  return {mx:c*half+s2*perp+2, my:s2*half+c*perp+2};
+}
 function stepParticles(dt){
   const {w,h}=fitCanvas(world());
   const anySugar=S.particles.some(p=>p.kind==="sugar");
@@ -768,10 +775,11 @@ function stepParticles(dt){
   for(const p of S.particles){
     if (p.held) continue;
     p.x+=p.vx*sc*dt; p.y+=p.vy*sc*dt; p.rot+=(p.vr||0)*sc*dt;
-    const m=p.r||12;
-    const mb=p.kind==="enzyme" ? p.r+18 : m;
-    if (p.x<m){p.x=m;p.vx=Math.abs(p.vx);} if (p.x>w-m){p.x=w-m;p.vx=-Math.abs(p.vx);}
-    if (p.y<m){p.y=m;p.vy=Math.abs(p.vy);} if (p.y>h-mb){p.y=h-mb;p.vy=-Math.abs(p.vy);}
+    let mx=p.r||12, my=p.r||12;
+    if (p.kind==="sugar"){ const mm=sugarHalf(p); mx=mm.mx; my=mm.my; }
+    const mb=p.kind==="enzyme" ? p.r+18 : my;
+    if (p.x<mx){p.x=mx;p.vx=Math.abs(p.vx);} if (p.x>w-mx){p.x=w-mx;p.vx=-Math.abs(p.vx);}
+    if (p.y<my){p.y=my;p.vy=Math.abs(p.vy);} if (p.y>h-mb){p.y=h-mb;p.vy=-Math.abs(p.vy);}
     if (p.kind==="enzyme") stepBonds(p,dt);
   }
   tryReactions(dt);
@@ -979,6 +987,7 @@ function drawLab(){
     ctx.strokeStyle=COL.amber; ctx.setLineDash([5,4]); ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.arc(e.x,e.y,46,0,TAU); ctx.stroke(); ctx.setLineDash([]);
   }
+  document.getElementById("stageHint").style.visibility = S.inspect ? "hidden" : "visible";
   drawInspector(ctx,w,h);
 }
 
@@ -1123,6 +1132,7 @@ function drawChart(){
   /* series */
   drawChart._placed=[];
   const series=[["st",COL.starch,"starch"],["gy",COL.sGlycogen,"glycogen"],["ma",COL.maltose,"maltose"],["gl",COL.glucose,"glucose"]];
+  ctx.save(); ctx.beginPath(); ctx.rect(padL,padT-2,w-padL-padR+1,h-padT-padB+4); ctx.clip();
   for(const [k,col,name] of series){
     if (S.chart.hidden[name]) continue;
     ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath();
@@ -1130,6 +1140,10 @@ function drawChart(){
     for(const d of view){ const x=X(d.t),y=Y(d[k]);
       if(!started){ctx.moveTo(x,y);started=true;} else ctx.lineTo(x,y);}
     ctx.stroke();
+  }
+  ctx.restore();
+  for(const [k,col,name] of series){
+    if (S.chart.hidden[name]) continue;
     if (view.length){ const last=view[view.length-1];
       let ly=clamp(Y(last[k]), padT+8, h-padB-4);
       for(const py of drawChart._placed) if (Math.abs(ly-py)<12) ly=py+12;
@@ -1618,10 +1632,10 @@ function drawInspector(ctx,w,h){
       drawSugar(ctx,fake,ssc);
       const facts=SUGAR_FACTS[p.stype]||[];
       ctx.fillStyle=COL.ink; ctx.font="12.5px sans-serif"; ctx.textAlign="center";
-      facts.forEach((f2,i)=>ctx.fillText(f2, cx, Y+H2-58+i*16));
-      if (p.limit){ ctx.fillStyle=COL.amber; ctx.fillText("this one is a LIMIT DEXTRIN — amylase stopped at its α-1,6 branch points", cx, Y+H2-26); }
+      facts.forEach((f2,i)=>ctx.fillText(f2, cx, Y+H2-52+i*16));
+      if (p.limit){ ctx.fillStyle=COL.amber; ctx.fillText("this one is a LIMIT DEXTRIN — amylase stopped at its α-1,6 branch points", cx, Y+H2-22); }
     } else {
-      drawSugarChem(ctx,X,Y+74,W2,H2-104,p);
+      drawSugarChem(ctx,X,Y+88,W2,H2-118,p);
     }
   } else if (p.kind==="enzyme"){
     if (I.view==="simple"){
@@ -1667,11 +1681,11 @@ function drawInspector(ctx,w,h){
         ctx.fillText("active site", Math.min(sx0+srad+6, X+W2-92), clamp(sy0+4, bodyTop+12, Y+H2-70));
       }
       ctx.fillStyle=COL.mut; ctx.font="11px sans-serif"; ctx.textAlign="center";
-      ctx.fillText("the chain OPENED UP so every bond is visible — each numbered line joins the two amino acids it holds together (in the beaker it is folded into a tangle)", cx, Y+H2-46);
+      ctx.fillText("the chain OPENED UP so every bond is visible — each numbered line joins the two amino acids it holds together (in the beaker it is folded into a tangle)", cx, Y+H2-40);
       ctx.fillStyle=p.denatured?COL.ox:COL.vir; ctx.font="bold 12px sans-serif";
-      ctx.fillText(p.denatured?"DENATURED — shape and active site lost":"NATIVE — fold intact", cx, Y+H2-28);
+      ctx.fillText(p.denatured?"DENATURED — shape and active site lost":"NATIVE — fold intact", cx, Y+H2-22);
     } else {
-      drawEnzymeChem(ctx,X,Y+74,W2,H2-104,p);
+      drawEnzymeChem(ctx,X,Y+88,W2,H2-118,p);
     }
   } else {
     ctx.fillStyle=COL.ink; ctx.font="13px sans-serif"; ctx.textAlign="center";
@@ -2274,7 +2288,12 @@ window.addEventListener("load",()=>{
     if (q.has("t"))  fire("tSlider",  Math.min(100,Math.max(0,parseFloat(q.get("t"))||37)));
     if (q.has("ph")) fire("phSlider", Math.min(13,Math.max(1,parseFloat(q.get("ph"))||7)));
     if (q.has("speed")) S.speed=Math.min(3,Math.max(0.5,parseFloat(q.get("speed"))||1));
-    if (q.has("open")) setTimeout(()=>{ if(S.needSpawn){spawnAll(); S.needSpawn=false;} openInspector(S.scopeTarget||S.particles.find(p=>p.kind==="enzyme")); }, 250);
+    if (q.has("open")) setTimeout(()=>{ if(S.needSpawn){spawnAll(); S.needSpawn=false;}
+      const key=q.get("open");
+      const pick=S.particles.find(p=>p.stype===key||p.etype===key||(key==="inhib"&&p.kind==="inhib"));
+      openInspector(pick||S.scopeTarget||S.particles.find(p=>p.kind==="enzyme"));
+      if (S.inspect && q.get("view")==="chem") S.inspect.view="chem";
+      if (S.inspect && S.inspect.p.kind==="enzyme") S.scopeTarget=S.inspect.p; }, 250);
   }catch(_){ } }, 60);
   document.getElementById("tSlider").addEventListener("input",e=>{
     S.T=+e.target.value; document.getElementById("tOut").textContent=S.T+" °C";
