@@ -105,6 +105,7 @@
   .status.native{background:var(--virLt); color:var(--vir)}
   .status.stressed{background:var(--amberLt); color:var(--amber)}
   .status.denatured{background:var(--oxLt); color:var(--ox)}
+  .state.warn{background:#F3E3C2; color:#8A5A0E}
   footer.graph{padding:10px 18px 12px; flex:0 0 auto}
   .gheader{display:flex; align-items:center; justify-content:space-between;
     padding:7px 12px; background:var(--oat); border-bottom:1px solid var(--rule); border-radius:5px 5px 0 0}
@@ -319,6 +320,7 @@
         <li><b>Cellulose is not digested here</b> — amylase’s active site cannot bind β-1,4 chains, and humans make no cellulase. Amylase also stalls at branch points (limit dextrin) — debranching enzymes exist, but not in this beaker.</li>
         <li>A <b>competitive inhibitor</b> resembles the substrate’s shape, blocks the active site, and is not changed.</li>
         <li>Optima are <b>protein-specific</b>: these enzymes like ~37 °C and pH 7; pepsin’s optimum is stomach acid, pH ≈ 1.5.</li>
+        <li><b>Substrates do not denature:</b> denaturation is a protein word — sugars have no tertiary structure held by weak bonds, so heat and pH leave them intact here. (Real hot strong acid does slowly hydrolyse starch — that is how glucose syrup was first made — but it takes hours, so it is omitted.)</li>
         <li><b>The thresholds are literature-anchored:</b> the ionic bond fails below pH ≈ 4 (carboxyl pKa ≈ 4, –COO⁻ gains H⁺) or above pH ≈ 10.5 (lysine pKa ≈ 10.5, –NH₃⁺ loses H⁺); the hydrogen-bond network fails below ~pH 3 and above ~pH 11–12.5; typical mesophilic enzymes unfold between ~48 and 65 °C (salivary amylase and egg albumin both fail near 60 °C). Disulfides survive heat — but sustained strong alkali (pH ≳ 13) destroys even them, slowly.</li>
         <li>Enzymes are <b>reused, never used up</b> — watch the reaction counter.</li>
       </ul>
@@ -391,7 +393,8 @@ function narrate(msg, hot, pos, routineKey){
 }
 function drainNarration(){
   if (!S.narrQ || !S.narrQ.length) return;
-  if (S._narrLast && (S.t-S._narrLast)<2.2) return;
+  const dwell = S.narrQ.length>=3 ? 1.2 : 2.2;
+  if (S._narrLast && (S.t-S._narrLast)<dwell) return;
   const n=S.narrQ.shift();
   S._narrLast=S.t;
   S.narr.push(n); if (S.narr.length>3) S.narr.shift();
@@ -601,15 +604,17 @@ function stepBonds(e, dt){
     const idx=e.bonds.indexOf(b);
     if (b.type==="disulfide"){
       if (b.intact && S.pH>=12.8){
+        if (!b.ssTimer) narrate(`${enzymeLabel(e)}: hot strong alkali is attacking the covalent disulfide — it fails in ~8 s if this continues (watch its row in the bond list)`, true, {x:e.x,y:e.y});
         b.ssTimer=(b.ssTimer||0)+dt;
         if (b.ssTimer>8){ b.intact=false; b.permanent=true; broke=true;
           narrate(`${enzymeLabel(e)}: even the covalent disulfide has succumbed — hot strong alkali destroys S–S bonds, slowly`, true, {x:e.x,y:e.y}); }
       } else b.ssTimer=0;
       continue;
     }
+    if (b.jit===undefined) b.jit=rand(-2,2);
     const tThresh = b.type==="H" ? [48,56,63][idx]||60 : 68;
     // HEAT — permanent
-    if (b.intact && S.T > tThresh + rand(-2,2)){
+    if (b.intact && S.T > tThresh + b.jit){
       b.intact=false; b.permanent=true; e.heatDead=true; broke=true;
       narrate(`${enzymeLabel(e)}: vibrations snapped ${b.type==="H"?"a hydrogen bond":"the ionic bond"} — shape is deforming`, true, {x:e.x,y:e.y});
     }
@@ -641,6 +646,9 @@ function stepBonds(e, dt){
     if (e.holding){ e.holding.held=false; e.holding=null; e.holdPhase=null; }
     if (e.boundInhib){ e.boundInhib.held=false; e.boundInhib=null; }
     narrate(`${enzymeLabel(e)} has DENATURED — active site lost. ${e.heatDead?"Cooling will not refold it.":"Only a return to mild pH might."}`, true, {x:e.x,y:e.y});
+  }
+  if (wasDenatured && !e.denatured){
+    narrate(`${enzymeLabel(e)} has REFOLDED — the insult was mild, the weak bonds re-formed, the active site is back`, true, {x:e.x,y:e.y});
   }
 }
 
@@ -750,6 +758,11 @@ function completeReaction(e){
 
 function stepParticles(dt){
   const {w,h}=fitCanvas(world());
+  const anySugar=S.particles.some(p=>p.kind==="sugar");
+  if (S.T>=80 && anySugar)
+    narrate("notice what is NOT happening: the sugars are untouched — denaturation needs a 3-D fold held by weak bonds, and only the proteins have one", false, undefined, "r-sugarheat");
+  if ((S.pH<=2 || S.pH>=12.5) && anySugar)
+    narrate("the glycosidic bonds are covalent — hot strong acid really does hydrolyse starch in industry, but over hours; on this timescale only the proteins fail", false, undefined, "r-sugarph");
   const sc=speedScale();
   for(const p of S.particles){
     if (p.held) continue;
@@ -1018,7 +1031,11 @@ function drawScope(){
       : b.type==="ionic"
       ? `<svg class="sym" viewBox="0 0 34 12"><line x1="1" y1="6" x2="33" y2="6" stroke="#8A63B8" stroke-width="3" stroke-dasharray="2 4"/></svg>`
       : `<svg class="sym" viewBox="0 0 34 12"><line x1="1" y1="6" x2="33" y2="6" stroke="${COL.beadCys}" stroke-width="4"/></svg>`;
-    const state=b.intact?`<span class="state ok">intact</span>`:`<span class="state bad">${b.permanent?"broken":"broken*"}</span>`;
+    const state = b.intact
+      ? (b.type==="disulfide" && b.ssTimer>0
+          ? `<span class="state warn">under attack · ${Math.max(0,8-b.ssTimer).toFixed(0)} s</span>`
+          : `<span class="state ok">intact</span>`)
+      : `<span class="state bad">${b.permanent?"broken for good":"broken — can re-form"}</span>`;
     return `<li>${chip}${sym}${label}${state}</li>`;
   });
   rows.push(`<li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="rgba(214,185,140,.5)"/></svg>hydrophobic core (inside)<span class="state ${e.unfold<0.4?'ok':'bad'}">${e.unfold<0.4?"tucked in":"exposed"}</span></li>`);
@@ -2226,6 +2243,13 @@ window.addEventListener("load",()=>{
   exWrap.querySelectorAll(".exbtn").forEach(b=>b.addEventListener("click",()=>setEx(b.dataset.ex)));
   document.getElementById("btnExRestart").addEventListener("click",()=>{ if(S.ex!=="polypeptide"){ S.bx=newBondEx(S.ex); document.getElementById("waterCount").textContent=0; }});
   setTimeout(()=>setEx("polypeptide"),0);
+  setTimeout(()=>{ try{
+    const q=new URLSearchParams(location.search);
+    const fire=(id,v)=>{ const el=document.getElementById(id); el.value=v; el.dispatchEvent(new Event("input")); };
+    if (q.has("t"))  fire("tSlider",  Math.min(100,Math.max(0,parseFloat(q.get("t"))||37)));
+    if (q.has("ph")) fire("phSlider", Math.min(13,Math.max(1,parseFloat(q.get("ph"))||7)));
+    if (q.has("speed")) S.speed=Math.min(3,Math.max(0.5,parseFloat(q.get("speed"))||1));
+  }catch(_){ } }, 60);
   document.getElementById("tSlider").addEventListener("input",e=>{
     S.T=+e.target.value; document.getElementById("tOut").textContent=S.T+" °C";
     document.getElementById("trow").classList.toggle("hot",S.T>45);
@@ -2236,7 +2260,8 @@ window.addEventListener("load",()=>{
   });
   document.getElementById("phSlider").addEventListener("input",e=>{
     S.pH=+e.target.value; document.getElementById("phOut").textContent=S.pH.toFixed(1);
-    if (S.pH<3.2 || S.pH>11.2) narrate("extreme pH: the hydrogen-bond network itself is failing — this damage is permanent", true);
+    if (S.pH<=2.6 || S.pH>=11.6) narrate("extreme pH: the hydrogen-bond network is collapsing — at this extreme the damage is permanent", true);
+    else if (S.pH<3.2 || S.pH>11.2) narrate("the hydrogen-bond network itself is starting to fail — still (just) reversible if you return now", true);
     else if (S.pH<4.2) narrate("below pH ≈ 4: carboxyl R-groups (pKa ≈ 4) pick up H⁺ and lose their charge — ionic bonds break", true);
     else if (S.pH>10.3) narrate("above pH ≈ 10.5: lysine R-groups (pKa ≈ 10.5) lose their H⁺ and their + charge — ionic bonds break", true);
     else if (Math.abs(S.pH-7)>0.1) narrate("mild pH shift: charges mostly intact — reversible territory");
