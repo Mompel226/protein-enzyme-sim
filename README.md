@@ -1,8 +1,17 @@
-# Protein & Enzyme Lab
+# Protein & Enzyme Sim
 
-An interactive simulation for **IB Biology SL — B1.2 Proteins and C1.1 Enzymes** (first assessment 2025). Single self-contained HTML file; no installation, no dependencies.
+An interactive simulation of proteins and enzymes — built for **IB Biology SL, B1.2 Proteins and
+C1.1 Enzymes** (first assessment 2025), and just as useful for **Cambridge IGCSE 0610 topics 4
+and 5** (biological molecules, enzymes). Single self-contained HTML file; no installation, no
+dependencies.
 
-**Run it:** open `index.html`, or use the GitHub Pages link for this repository.
+**Live:** https://mompel226.github.io/protein-enzyme-sim/ — or open `index.html`.
+
+**Where it sits:** a *sim* on the Foundations shelf of the
+[Biology Hub](https://mompel226.github.io/biology-hub/), the front door to every Biology app at
+NLCS Jeju. A sim is a sandbox — nothing happens unless you act, and nothing is marked — which is
+what separates it from a *lab*. The repository was renamed from `protein-enzyme-lab` on
+6 September 2026 for that reason; the old address no longer works.
 
 ## Mode 1 · Bond builder (B1.1.5–7 · B1.1.9 · B1.2.1–2)
 
