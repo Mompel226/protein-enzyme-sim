@@ -43,3 +43,20 @@ The **?** button in the app lists exactly what is accurate (bond types, mechanis
 ---
 
 Made for NLCS Jeju Biology. Built with plain HTML5 canvas; works offline once loaded.
+
+## Licence
+
+| What | Licence |
+|---|---|
+| **The software** — everything that runs: JavaScript, Apps Script, Python, Swift, HTML structure, CSS, build tools | [AGPL-3.0](LICENSE) |
+| **The teaching material** — question text, explanations, diagrams and images I made, wherever they are stored | [CC BY-NC-SA 4.0](LICENSE-CONTENT) |
+
+**In plain English.** Use it, change it, run it for your students — free, and you never need to ask.
+If you change the software and let anyone else use it, *including over a network*, you have to publish
+your source under the same licence. You may not sell the teaching material or use it commercially, and
+the credit has to stay.
+
+**Not covered:** third-party images and media keep their own licences — see the picture credits.
+
+© 2026 Dr Daniel Mompel Riera. I hold the copyright, so I can grant other terms: if you want to use any of
+this commercially, ask me at <dmompelriera@nlcsjeju.kr>.
