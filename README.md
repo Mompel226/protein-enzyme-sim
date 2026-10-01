@@ -23,7 +23,7 @@ Six guided builds, all using the same pick-the-leaving-atoms chemistry (–OH + 
 - A partly finished maltase chain; the **gene dictates the order** of the last four amino acids (Ser–Cys–Asp–Lys). Wrong amino acid → rejected, with the reason.
 - **Drag** the amino acid to the chain's carboxyl end, then — in a large close-up — **click the two atoms that leave as water**: the chain's carboxyl –OH and the newcomer's amine –H. Wrong atoms (the double-bonded O, the R-group, the wrong end) are refused with an explanation.
 - Watch the condensation slowly: water forms and leaves, the C–N **peptide bond** draws in, the word equation and the H₂O counter update.
-- Fold the finished chain: 3 hydrogen bonds, 1 ionic bond (Asp⁻·Lys⁺), 1 disulfide (Cys–Cys), and a hydrophobic core tucked **inside** the fold. Then send *your* maltase into the lab.
+- Fold the finished chain: 3 hydrogen bonds, 1 ionic bond (Asp⁻·Lys⁺), 1 disulfide (Cys–Cys), and a hydrophobic core tucked **inside** the fold. Then send *your* maltase into the lab. The bonds that hold the fold are **HL (B1.2.9)**, and the sim labels them so wherever they are named; SL needs only that heat and pH change the shape (B1.2.5).
 
 ## Mode 2 · Enzyme lab (C1.1 · B1.2.5 · B1.1.5–7)
 
