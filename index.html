@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Protein &amp; Enzyme Lab — IB Biology B1.2 · C1.1</title>
+<title>Protein &amp; Enzyme Sim — IB Biology B1.2 · C1.1</title>
 <style>
   :root{
     --ink:#241F1B; --oat:#F4EFE7; --oat2:#EBE3D6; --panel:#FFFFFF; --rule:#D8CEBF;
@@ -32,6 +32,10 @@
   header .titleblock{margin-right:auto}
   header h1{font-size:21px; font-weight:700}
   header .sub{color:var(--mut); font-size:11.5px; letter-spacing:.04em}
+  header .up{display:block; margin:0 0 3px; font-size:12.5px; color:#CFC6B8; text-decoration:none}
+  header .up:hover, header .up:focus-visible{color:#fff; text-decoration:underline}
+  header .by{margin-top:2px; font-size:11.5px; color:#CFC6B8}
+  header .by a{color:#CFC6B8; text-decoration:none; border-bottom:1px dotted currentColor}
   .chips{display:flex; gap:6px}
   .chip{font-size:10px; font-weight:700; letter-spacing:.08em; padding:3px 8px; border-radius:2px}
   .chip.b12{background:var(--vir); color:#fff}
@@ -100,6 +104,8 @@
   .bondlist li:last-child{border-bottom:0}
   .bondlist .sym{width:34px; height:12px; flex:0 0 34px}
   .bondlist .state{margin-left:auto; font-weight:700; font-size:11px}
+  .hltag{font-size:10px; font-weight:700; letter-spacing:.06em; color:var(--vir); border:1px solid var(--vir); padding:0 5px; border-radius:2px; white-space:nowrap; font-style:normal}
+  .bondlist li.hlrow{display:block; font-size:11px; color:var(--mut); line-height:1.35}
   .ok{color:var(--vir)} .bad{color:var(--ox)}
   .status{font-weight:700; font-size:13px; padding:6px 10px; border-radius:3px; text-align:center; margin-top:8px}
   .status.native{background:var(--virLt); color:var(--vir)}
@@ -177,8 +183,10 @@
 <div id="appwrap">
 <header>
   <div class="titleblock">
-    <h1>Protein &amp; Enzyme Lab</h1>
+    <a class="up" href="https://nlcsbiology.com/biology-hub/">← Biology Hub</a>
+    <h1>Protein &amp; Enzyme Sim</h1>
     <div class="sub">BUILD IT · WORK IT · BREAK IT</div>
+    <div class="by">by <a href="https://github.com/Mompel226" target="_blank" rel="noopener">Dr Daniel Mompel Riera</a></div>
   </div>
   <div class="chips"><span class="chip b12">IB BIOLOGY · B1.2</span><span class="chip c11">C1.1</span></div>
   <nav class="tabs">
@@ -300,7 +308,7 @@
   </div>
 </footer>
 <div class="footerline">
-  <span>Made for IB Biology SL — B1.2 Proteins &amp; C1.1 Enzymes · NLCS Jeju Biology</span>
+  <span>Something wrong, or a suggestion? Please contact me: <a href="mailto:dmompelriera@nlcsjeju.kr">dmompelriera@nlcsjeju.kr</a> · Made for IB Biology SL — B1.2 Proteins &amp; C1.1 Enzymes · NLCS Jeju Biology</span>
   <span>Denaturation here is <b>usually permanent</b> — Reset for fresh enzymes.</span>
 </div>
 
@@ -309,11 +317,11 @@
   <div class="box">
     <button class="tbtn close" onclick="document.getElementById('helpModal').classList.remove('open')">Close</button>
     <h2>What is real, and what is simplified</h2>
-    <p style="color:var(--mut);margin:4px 0 6px">Straight answer: the molecule <b>shapes are cartoons</b>, drawn small enough to see every bond. The <b>bond types, the chemistry and the behaviour</b> are the real science your exams test.</p>
+    <p style="color:var(--mut);margin:4px 0 6px">Straight answer: the molecule <b>shapes are cartoons</b>, drawn small enough to see every bond. The <b>bond types, the chemistry and the behaviour</b> are the real science. <b>SL</b> needs only that heat and pH change a protein’s shape (denaturation, B1.2.5); naming the bonds that hold the fold is <span class="hltag">HL (B1.2.9)</span>.</p>
     <div class="note-card good">
       <h4>✓ REAL — trust these</h4>
       <ul>
-        <li>Proteins are chains of amino acids folded into shapes pinned by <b>weak interactions between R-groups</b>: hydrogen bonds, ionic bonds, hydrophobic cores — plus covalent <b>disulfide bonds</b> between cysteines.</li>
+        <li><span class="hltag">HL (B1.2.9)</span> Proteins are chains of amino acids folded into shapes pinned by <b>weak interactions between R-groups</b>: hydrogen bonds, ionic bonds, hydrophobic cores — plus covalent <b>disulfide bonds</b> between cysteines. SL needs only that heat and pH change the shape.</li>
         <li><b>Heat</b> → more kinetic energy → faster collisions and reactions, until vibration <b>breaks the weak intramolecular bonds</b>: denaturation. Peptide bonds and the sequence survive. Heat damage is <b>usually permanent</b>.</li>
         <li><b>pH</b> changes the charges on acidic (–COO⁻) and basic (–NH₃⁺) R-groups, breaking or re-making <b>ionic bonds</b>. Mild shifts can be reversible; extremes are not.</li>
         <li><b>Hydrolysis consumes water; condensation releases it</b> — watch the blue droplets.</li>
@@ -343,6 +351,7 @@
         <li><b>B1.1.5–7</b> starch (amylose + amylopectin), glycogen, cellulose — compare them in the inspector’s Chemical view.</li>
         <li><b>B1.2.1–2</b> amino acid structure and condensation — the Bond builder.</li>
         <li><b>B1.2.5</b> pH and temperature on protein structure — “denaturation”. Salts are omitted: the syllabus names pH and temperature.</li>
+        <li><span class="hltag">HL (B1.2.9)</span> the bonds that hold the fold — hydrogen, ionic, disulfide and the hydrophobic core: the folded chain in the Bond builder, the bond list and the inspector’s bond key. SL needs only that heat and pH change the shape.</li>
         <li><b>C1.1</b> enzymes, active sites, collisions, denaturation, inhibitors.</li>
       </ul>
     </div>
@@ -1072,6 +1081,7 @@ function drawScope(){
       : `<span class="state bad">${b.permanent?"broken for good":"broken — can re-form"}</span>`;
     return `<li>${chip}${sym}${label}${state}</li>`;
   });
+  rows.unshift(`<li class="hlrow"><span class="hltag">HL (B1.2.9)</span> the bonds that hold the fold. SL needs only that heat and pH change the shape.</li>`);
   rows.push(`<li><svg class="sym" viewBox="0 0 34 12"><circle cx="17" cy="6" r="5.5" fill="rgba(214,185,140,.5)"/></svg>hydrophobic core (inside)<span class="state ${e.unfold<0.4?'ok':'bad'}">${e.unfold<0.4?"tucked in":"exposed"}</span></li>`);
   list.innerHTML=rows.join("");
   const brokenW=e.bonds.filter(b=>b.type!=="disulfide"&&!b.intact).length;
@@ -1238,7 +1248,7 @@ function stepBuild(dt){
     }
   }
   if (b.folding){ b.folded=clamp(b.folded+dt/2.2,0,1); if(b.folded>=1){b.folding=false; refreshBuildUI();
-    narrate("folded! the disulfide, ionic and hydrogen bonds now pin the 3-D shape — this is what pH and heat attack"); } }
+    narrate("folded! the disulfide, ionic and hydrogen bonds (HL, B1.2.9) now pin the 3-D shape — this is what pH and heat attack"); } }
 }
 function drawCloseup(ctx,w,h,b){
   const a=b.anim;
@@ -1266,12 +1276,12 @@ function drawCloseup(ctx,w,h,b){
     const reg=(pos,id,ok,msg)=>{ const p=T(pos); a.hits.push({x:p.x,y:p.y,r:19,id,ok,msg}); };
     reg(at1.OH,"chainOH",true,null);
     reg(at1.O2,"chainO2",false,"that oxygen stays — it is double-bonded to the carbon; the –O–H beside it is what leaves");
-    reg(at1.R,"chainR",false,"R-groups never take part in the peptide bond — they decide the folding later (B1.2.9)");
+    reg(at1.R,"chainR",false,"R-groups never take part in the peptide bond — they decide the folding later (B1.2.9, HL)");
     reg(at1.N,"chainN",false,"that nitrogen is already locked inside the previous peptide bond");
     reg(at2.H1,"incH",true,null);
     reg(at2.N,"incN",false,"close — the nitrogen itself stays; one of its HYDROGEN atoms leaves as part of water");
     reg(at2.OH,"incOH",false,"wrong end — this carboxyl stays free as the NEW carboxyl terminal; it is the amine that joins the chain");
-    reg(at2.R,"incR",false,"R-groups never take part in the peptide bond — they decide the folding later (B1.2.9)");
+    reg(at2.R,"incR",false,"R-groups never take part in the peptide bond — they decide the folding later (B1.2.9, HL)");
     for(const ht of a.hits){
       const chosen=(ht.id==="chainOH"&&a.picked.oh)||(ht.id==="incH"&&a.picked.h);
       ctx.beginPath(); ctx.arc(ht.x,ht.y,ht.r,0,TAU);
@@ -1410,10 +1420,12 @@ function drawBuild(){
     e.unfold = 1-b.folded;
     drawEnzyme(ctx,e,{x:w/2,y:h/2-10,scale:2.4,upright:true,noName:true});
     ctx.fillStyle=COL.ink; ctx.font="bold 15px Georgia, serif"; ctx.textAlign="center";
-    ctx.fillText("your maltase", w/2, h-64);
+    ctx.fillText("your maltase", w/2, h-80);
     if (b.folded>=1){
       ctx.fillStyle=COL.mut; ctx.font="12px sans-serif";
-      ctx.fillText("held by: 3 hydrogen bonds · 1 ionic bond (Asp⁻ · Lys⁺) · 1 disulfide (Cys–Cys) · a hydrophobic core tucked inside, away from water", w/2, h-42);
+      ctx.fillText("held by: 3 hydrogen bonds · 1 ionic bond (Asp⁻ · Lys⁺) · 1 disulfide (Cys–Cys) · a hydrophobic core tucked inside, away from water", w/2, h-58);
+      ctx.fillStyle=COL.vir; ctx.font="bold 11px sans-serif";
+      ctx.fillText("HL (B1.2.9): naming these bonds. SL needs only that heat and pH change the shape.", w/2, h-38);
     }
     return;
   }
@@ -1661,7 +1673,7 @@ function drawInspector(ctx,w,h){
         });
         const bl=[["#4C8FD6","hydrogen bond","dash"],["#8A63B8","ionic bond","dot"],["#B08A1E","disulfide (covalent)","solid"]];
         ctx.fillStyle=COL.mut; ctx.font="bold 9.5px sans-serif";
-        ctx.fillText("BOND KEY", lx, ly0+124);
+        ctx.fillText("BOND KEY · HL (B1.2.9)", lx, ly0+124);
         bl.forEach(([col,lab,style],i)=>{
           const yy=ly0+140+i*20;
           ctx.strokeStyle=col; ctx.lineWidth=style==="solid"?3:2;
@@ -1811,6 +1823,8 @@ function drawEnzymeChem(ctx,X,Y,W2,H2,e){
     ctx.fillRect(x0,cardY,cw,cardH); ctx.strokeRect(x0,cardY,cw,cardH);
     ctx.fillStyle=c0.col; ctx.font="bold 11.5px sans-serif"; ctx.textAlign="center";
     ctx.fillText(c0.title.toUpperCase(), x0+cw/2, cardY+18);
+    ctx.fillStyle=COL.mut; ctx.font="bold 9.5px sans-serif";
+    ctx.fillText("HL (B1.2.9)", x0+cw/2, cardY+31);
     c0.draw(x0, cardY+cardH/2-2);
     ctx.fillStyle=COL.mut; ctx.font="italic 10px sans-serif";
     ctx.fillText(c0.note, x0+cw/2, cardY+cardH-10);
