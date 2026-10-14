@@ -32,8 +32,9 @@
   header .titleblock{margin-right:auto}
   header h1{font-size:21px; font-weight:700}
   header .sub{color:var(--mut); font-size:11.5px; letter-spacing:.04em}
-  header .up{display:block; margin:0 0 3px; font-size:12.5px; color:#CFC6B8; text-decoration:none}
-  header .up:hover, header .up:focus-visible{color:#fff; text-decoration:underline}
+  /* the way back (14 Oct 2026, Daniel: pupils missed it): a solid pill in this site's own colours */
+header .up{display:inline-flex;align-items:center;flex:none;white-space:nowrap;min-height:34px;margin:0 0 6px;padding:0 16px 0 13px;font-weight:650;font-size:14px;line-height:1;letter-spacing:0;text-transform:none;color:var(--ink);background:var(--oat);border:0;border-radius:999px;text-decoration:none;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+header .up:hover,header .up:focus-visible{background:#fff;color:var(--ink);text-decoration:none}
   header .by{margin-top:2px; font-size:11.5px; color:#CFC6B8}
   header .by a{color:#CFC6B8; text-decoration:none; border-bottom:1px dotted currentColor}
   .chips{display:flex; gap:6px}
@@ -183,7 +184,7 @@
 <div id="appwrap">
 <header>
   <div class="titleblock">
-    <a class="up" href="https://nlcsbiology.com/biology-hub/">← Biology Hub</a>
+    <a class="up" href="https://nlcsbiology.com/biology-hub/">← Back to Biology Hub</a>
     <h1>Protein &amp; Enzyme Sim</h1>
     <div class="sub">BUILD IT · WORK IT · BREAK IT</div>
     <div class="by">by <a href="https://github.com/Mompel226" target="_blank" rel="noopener">Dr Daniel Mompel Riera</a></div>
